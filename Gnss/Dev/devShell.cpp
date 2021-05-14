@@ -1,6 +1,7 @@
 #include "devShell.h"
 
 #include "devDataSet.h"
+#include "devDB.h"
 #include "devLog.h"
 
 #include <iostream>
@@ -20,6 +21,7 @@ static const std::vector<utils::shell::tShellCommandList> g_ShellCommandList
 	{ (char*)"echo",   (char*)"ECHO 0-off, 1-on",      tShell::HandlerECHO },
 	{ (char*)"log",    (char*)"log 0-off, 1-on",      tShell::HandlerLog },
 	{ (char*)"gnss",   (char*)"",      tShell::HandlerGNSS },
+	{ (char*)"db",     (char*)"",      tShell::HandlerDB },
 	{ (char*)"exit",   (char*)"",      tShell::HandlerEXIT },
 	{ 0 }
 };
@@ -163,6 +165,68 @@ bool tShell::HandlerGNSS(const std::vector<std::string>& data)
 		std::cout << std::setw(10) << std::setfill(' ') << std::left << "halt" << std::right << std::setw(20) << "comment...\n";
 		std::cout << std::setw(10) << std::setfill(' ') << std::left << "exit" << std::right << std::setw(20) << "comment...\n";
 	}
+	return true;
+}
+
+bool tShell::HandlerDB(const std::vector<std::string>& data)
+{
+	try
+	{
+		if (data.size() == 2 && data[1] == "clear")
+		{
+			db::Clear();
+		}
+		else if (data.size() == 2 && data[1] == "create")
+		{
+			db::Open();
+		}
+		else if (data.size() == 2 && data[1] == "drop")
+		{
+			db::Drop();
+		}
+		else if (data.size() == 3 && data[1] == "get")
+		{
+			db::tTable Table;
+
+			if (data[2] == "pos")
+			{
+				Table = db::GetTablePos();
+			}
+			else if (data[2] == "rcv")
+			{
+				Table = db::GetTableRcv();
+			}
+			else if (data[2] == "sat")
+			{
+				Table = db::GetTableSat();
+			}
+			else if (data[2] == "sys")
+			{
+				Table = db::GetTableSys();
+			}
+
+			for (db::tTableRow& row : Table)
+			{
+				for (std::string& i : row)
+				{
+					std::cout << "[" << i << "]";
+				}
+				std::cout << '\n';
+			}
+		}
+		else
+		{
+			std::cout << std::setw(10) << std::setfill(' ') << std::left << "clear" << std::right << std::setw(20) << "clears Database\n";
+			std::cout << std::setw(10) << std::setfill(' ') << std::left << "create" << std::right << std::setw(20) << "comment...\n";
+			std::cout << std::setw(10) << std::setfill(' ') << std::left << "drop" << std::right << std::setw(20) << "drops Database\n";
+			//std::cout << std::setw(10) << std::setfill(' ') << std::left << "exit" << std::right << std::setw(20) << "comment...\n";
+		}
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "Exception: " << e.what() << "\n";
+	}
+
 	return true;
 }
 

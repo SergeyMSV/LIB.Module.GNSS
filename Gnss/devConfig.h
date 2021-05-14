@@ -6,6 +6,8 @@
 #include <mutex>
 #include <string>
 
+#define DEV_DB_VERSION "DuperDBase 0.0.1"
+
 struct tDataSetMainControl
 {
 	enum class tStateGNSS
