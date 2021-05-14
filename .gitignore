@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.VC.opendb
+*.tlog
+*.ipch
+*.log
+*.recipe
+*.ilk
+*.pdb
+*.vcxproj.FileListAbsolute.txt
+*.idb
