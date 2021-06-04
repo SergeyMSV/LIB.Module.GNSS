@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Gnss/**",
+                "${workspaceFolder}/Gnss/Dev/**",
+                "${workspaceFolder}/LIB.Utils/**",
+                "${workspaceFolder}/LIB.Module/**",
+                "/usr/local/boost_1_75_0_ARM/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/arm-linux-gnueabihf-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
