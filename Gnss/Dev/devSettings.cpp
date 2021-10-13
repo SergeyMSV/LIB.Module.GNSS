@@ -25,6 +25,20 @@ tSettings::tSettings(const std::string& fileName)
 		}
 	}
 
+	if (auto Value = PTree.get_child_optional("App.Settings.DB"))
+	{
+		auto ValueIter = (*Value).begin();
+
+		if (ValueIter->first == "<xmlattr>")
+		{
+			DB.Host = ValueIter->second.get<std::string>("Host");
+			DB.User = ValueIter->second.get<std::string>("User");
+			DB.Passwd = ValueIter->second.get<std::string>("Passwd");
+			DB.DB = ValueIter->second.get<std::string>("Name");
+			DB.Port = ValueIter->second.get<unsigned int>("Port");
+		}
+	}
+
 	if (auto Value = PTree.get_child_optional("App.Settings.GNSS_Receiver"))
 	{
 		auto ValueIter = (*Value).begin();

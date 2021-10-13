@@ -1,5 +1,6 @@
 #include <devConfig.h>
 
+#include <devDB.h>
 #include <devGNSS.h>
 #include <devSettings.h>
 
@@ -155,6 +156,17 @@ int main(int argc, char* argv[])
 		return static_cast<int>(tExitCode::EX_CONFIG);
 	}
 
+	try
+	{
+		dev::db::Open();
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "Exception: " << e.what() << "\n";
+
+		return static_cast<int>(tExitCode::EX_IOERR);
+	}
+
 	int CErr = static_cast<int>(tExitCode::EX_OK);
 	////////////////////////////////
 	std::thread Thread_Shell;
@@ -181,6 +193,8 @@ int main(int argc, char* argv[])
 
 		CErr = static_cast<int>(tExitCode::EX_IOERR);
 	}
+
+	dev::db::Close();
 
 	Thread_GNSS.join();
 
