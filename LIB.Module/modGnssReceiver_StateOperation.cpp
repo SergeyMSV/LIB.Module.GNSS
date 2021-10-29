@@ -2,6 +2,7 @@
 
 #include <utilsPacketNMEA.h>
 #include <utilsPacketNMEAPayload.h>
+#include <utilsPacketNMEAPayloadPTWS.h>
 
 #include <chrono>
 #include <thread>
@@ -123,6 +124,11 @@ void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& valu
 
 		m_pObj->m_pLog->Write(true, utils::tLogColour::LightMagenta, PacketData.Data[0] + " " + Msg.Date.ToString() + " " + Msg.Time.ToString());
 		m_pObj->m_pLog->WriteLine(false, utils::tLogColour::Default, StrTime.str());
+	}
+	else if (utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL::Try(PacketData.Data))
+	{
+		const utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL Msg(PacketData.Data);
+		m_DataSet.Jamming.insert({ Msg.Index.Value, Msg.Frequency.Value });
 	}
 	else
 	{

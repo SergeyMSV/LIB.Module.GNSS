@@ -16,6 +16,7 @@
 #include <ctime>
 #include <deque>
 #include <iomanip>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -130,6 +131,7 @@ struct tGnssDataSet
 	double Course = 0;
 
 	std::deque<tGNSS_Satellite> Satellite;
+	std::map<int, double> Jamming;
 
 	tGnssDataSet() = default;
 
@@ -159,6 +161,7 @@ struct tGnssDataSet
 
 
 		Stream << " " << Satellite.size();
+		Stream << " " << Jamming.size();
 
 		return Stream.str();
 	}
@@ -211,6 +214,24 @@ struct tGnssDataSet
 			Stream << "   \"snr\": \"" << static_cast<int>(Satellite[i].SNR.Value) << "\"\n";
 			Stream << "  }";
 			if (i < Satellite.size() - 1)
+			{
+				Stream << ",";
+			}
+			Stream << "\n";
+		}
+		Stream << " ],\n";
+
+		Stream << std::setprecision(6);//for jamming frequency
+
+		Stream << " \"jamming\": [\n";
+		std::size_t counter = 0;
+		for (const auto& i : Jamming)
+		{
+			Stream << "  {\n";
+			Stream << "   \"index\": \"" << i.first << "\",\n";
+			Stream << "   \"frequency\": \"" << i.second << "\"\n";
+			Stream << "  }";
+			if (++counter < Jamming.size())
 			{
 				Stream << ",";
 			}
