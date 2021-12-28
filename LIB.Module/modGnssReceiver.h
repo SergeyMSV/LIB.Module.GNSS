@@ -33,7 +33,7 @@ typedef utils::packet_NMEA::tPayloadGSV tMsgGSV;
 
 class tGnssReceiver
 {
-	using tClock = std::chrono::high_resolution_clock;//C++11
+	using tClock = std::chrono::steady_clock;//C++11
 
 	class tStateError;
 
