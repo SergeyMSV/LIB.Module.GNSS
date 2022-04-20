@@ -192,6 +192,16 @@ protected:
 //char FromBCD(char dataBCD); [TBD]
 //char ToBCD(char dataBCD); [TBD]
 
+enum class tDevStatus : std::uint8_t
+{
+	Init,
+	Operation,
+	Deinit,
+	Halted,
+	Error,
+	Unknown = 0xFF,
+};
+
 enum class tGNSSCode : std::uint8_t
 {
 	Unknown = 0,
