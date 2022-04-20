@@ -195,6 +195,7 @@
     <ClCompile Include="..\Lib.Module\modGnssReceiver_State_CmdREQ.cpp" />
     <ClCompile Include="..\Lib.Utils\utilsLog.cpp" />
     <ClCompile Include="..\LIB.Utils\utilsPacketNMEAType.cpp" />
+    <ClCompile Include="..\LIB.Utils\utilsPath.cpp" />
     <ClCompile Include="..\Lib.Utils\utilsShell.cpp" />
     <ClCompile Include="Dev\devSettings.cpp" />
     <ClCompile Include="Dev\devGNSS.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="..\Lib.Utils\utilsPacketNMEAPayload.h" />
     <ClInclude Include="..\LIB.Utils\utilsPacketNMEAPayloadPTWS.h" />
     <ClInclude Include="..\LIB.Utils\utilsPacketNMEAType.h" />
+    <ClInclude Include="..\LIB.Utils\utilsPath.h" />
     <ClInclude Include="..\LIB.Utils\utilsSerialPort.h" />
     <ClInclude Include="..\Lib.Utils\utilsShell.h" />
     <ClInclude Include="devConfig.h" />
