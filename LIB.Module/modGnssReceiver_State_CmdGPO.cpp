@@ -15,7 +15,7 @@ bool tGnssReceiver::tState::tCmdGPO::operator()()
 	{
 	case tStep::SetGPO:
 	{
-		tGnssTaskScriptCmdGPO* Ptr = static_cast<tGnssTaskScriptCmdGPO*>(m_Cmd.get());
+		auto Ptr = static_cast<tGnssTaskScriptCmdGPO*>(m_Cmd.get());
 
 		m_StartTime = tClock::now();
 
@@ -43,7 +43,7 @@ bool tGnssReceiver::tState::tCmdGPO::operator()()
 	}
 	case tStep::Pause:
 	{
-		const auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
+		auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
 
 		if (Time_us > m_WaitTime_us)
 		{

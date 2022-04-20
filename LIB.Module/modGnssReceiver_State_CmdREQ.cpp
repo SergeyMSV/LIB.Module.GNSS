@@ -15,7 +15,7 @@ bool tGnssReceiver::tState::tCmdREQ::operator()()
 	{
 	case tStep::SendMsg:
 	{
-		const tGnssTaskScriptCmdREQ* Ptr = static_cast<tGnssTaskScriptCmdREQ*>(m_Cmd.get());
+		auto Ptr = static_cast<tGnssTaskScriptCmdREQ*>(m_Cmd.get());
 
 		m_StartTime = tClock::now();
 
@@ -36,7 +36,7 @@ bool tGnssReceiver::tState::tCmdREQ::operator()()
 	}
 	case tStep::WaitRsp:
 	{
-		const auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
+		auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
 
 		if (Time_us > m_WaitTime_us)
 		{
@@ -46,7 +46,7 @@ bool tGnssReceiver::tState::tCmdREQ::operator()()
 	}
 	case tStep::PauseSet:
 	{
-		const tGnssTaskScriptCmdREQ* Ptr = static_cast<tGnssTaskScriptCmdREQ*>(m_Cmd.get());
+		auto Ptr = static_cast<tGnssTaskScriptCmdREQ*>(m_Cmd.get());
 
 		m_StartTime = tClock::now();
 
@@ -58,7 +58,7 @@ bool tGnssReceiver::tState::tCmdREQ::operator()()
 	}
 	case tStep::PauseWait:
 	{
-		const auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
+		auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
 
 		if (Time_us > m_WaitTime_us)
 		{
@@ -75,13 +75,13 @@ bool tGnssReceiver::tState::tCmdREQ::OnReceived(const tPacketNMEA_Template& valu
 {
 	if (m_Step == tStep::WaitRsp)
 	{
-		const tGnssTaskScriptCmdREQ* Ptr = static_cast<tGnssTaskScriptCmdREQ*>(m_Cmd.get());
+		auto Ptr = static_cast<tGnssTaskScriptCmdREQ*>(m_Cmd.get());
 
 		if (value.GetPayloadValue().find(Ptr->RspHead) == 0)
 		{
 			////
 			{//[TEST]
-				const auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
+				auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
 				std::stringstream StrTime;
 				StrTime << value.GetPayloadValue() << " --- " << Time_us << " us";
 				m_pObjState->m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightYellow, StrTime.str());
