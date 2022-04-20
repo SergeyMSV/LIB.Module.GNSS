@@ -65,7 +65,7 @@ void SetParam(T& valDst, U valSrc, bool& check)
 
 void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& value)
 {
-	const std::string Payload = value.GetPayload();
+	const std::string Payload = value.GetPayloadValue();
 
 	const tPacketNMEA::payload_type PacketData(Payload.cbegin(), Payload.cend());
 
@@ -76,9 +76,9 @@ void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& valu
 	m_StartTime = tClock::now();
 
 	//[TBD] it's possible to use std::map instead of following statement... just reg in map new handler...
-	if (tMsgGSV::Try(PacketData.Data))
+	if (tMsgGSV::Try(PacketData.Value))
 	{
-		tMsgGSV Msg(PacketData.Data);
+		tMsgGSV Msg(PacketData.Value);
 
 		for (auto& i : Msg.Satellite)//C++11
 		{
@@ -89,12 +89,12 @@ void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& valu
 		m_pObj->SetStrTimePeriod(StrTime, m_StartTime);
 		m_StartTime = tClock::now();
 
-		m_pObj->m_pLog->Write(true, utils::tLogColour::LightMagenta, PacketData.Data[0] + " " + Msg.MsgQty.ToString() + " " + Msg.MsgNum.ToString() + " " + Msg.SatelliteQty.ToString());
+		m_pObj->m_pLog->Write(true, utils::tLogColour::LightMagenta, PacketData.Value[0] + " " + Msg.MsgQty.ToString() + " " + Msg.MsgNum.ToString() + " " + Msg.SatelliteQty.ToString());
 		m_pObj->m_pLog->WriteLine(false, utils::tLogColour::Default, StrTime.str());
 	}
-	else if (tMsgRMC::Try(PacketData.Data))
+	else if (tMsgRMC::Try(PacketData.Value))
 	{
-		const tMsgRMC Msg(PacketData.Data);
+		const tMsgRMC Msg(PacketData.Value);
 
 		if (!Msg.Date.Empty())
 		{
@@ -122,12 +122,12 @@ void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& valu
 		m_pObj->SetStrTimePeriod(StrTime, m_StartTime);
 		m_StartTime = tClock::now();
 
-		m_pObj->m_pLog->Write(true, utils::tLogColour::LightMagenta, PacketData.Data[0] + " " + Msg.Date.ToString() + " " + Msg.Time.ToString());
+		m_pObj->m_pLog->Write(true, utils::tLogColour::LightMagenta, PacketData.Value[0] + " " + Msg.Date.ToString() + " " + Msg.Time.ToString());
 		m_pObj->m_pLog->WriteLine(false, utils::tLogColour::Default, StrTime.str());
 	}
-	else if (utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL::Try(PacketData.Data))
+	else if (utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL::Try(PacketData.Value))
 	{
-		const utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL Msg(PacketData.Data);
+		const utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL Msg(PacketData.Value);
 		m_DataSet.Jamming.insert({ Msg.Index.Value, Msg.Frequency.Value });
 	}
 	else
@@ -136,11 +136,11 @@ void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& valu
 		m_pObj->SetStrTimePeriod(StrTime, m_StartTime);
 		m_StartTime = tClock::now();
 
-		m_pObj->m_pLog->Write(true, utils::tLogColour::Yellow, PacketData.Data[0]);
+		m_pObj->m_pLog->Write(true, utils::tLogColour::Yellow, PacketData.Value[0]);
 		m_pObj->m_pLog->WriteLine(false, utils::tLogColour::Default, StrTime.str());
 	}
 
-	if (!m_SettingsNMEA.MsgLast.empty() && PacketData.Data.size() > 0 && PacketData.Data[0].find(m_SettingsNMEA.MsgLast) != std::string::npos)
+	if (!m_SettingsNMEA.MsgLast.empty() && PacketData.size() > 0 && PacketData.Value[0].find(m_SettingsNMEA.MsgLast) != std::string::npos)
 	{
 		m_pObj->OnChanged(m_DataSet);
 

@@ -182,7 +182,7 @@ bool tGnssReceiver::tState::OnCmdFailed()
 
 void tGnssReceiver::tState::OnReceived(const tPacketNMEA_Template& value)
 {
-	m_pObj->m_pLog->WriteLine(false, utils::tLogColour::LightYellow, "OnReceived: " + value.GetPayload());
+	m_pObj->m_pLog->WriteLine(false, utils::tLogColour::LightYellow, "OnReceived: " + value.GetPayloadValue());
 }
 
 }
