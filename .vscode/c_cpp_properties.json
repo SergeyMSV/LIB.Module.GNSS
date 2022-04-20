@@ -8,7 +8,7 @@
                 "${workspaceFolder}/Gnss/Dev/**",
                 "${workspaceFolder}/LIB.Utils/**",
                 "${workspaceFolder}/LIB.Module/**",
-                "/usr/local/boost_1_75_0_ARM/**"
+                "/usr/local/boost_1_77_0_ARM/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/arm-linux-gnueabihf-gcc",
