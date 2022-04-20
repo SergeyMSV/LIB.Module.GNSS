@@ -77,18 +77,18 @@ bool tGnssReceiver::tState::tCmdREQ::OnReceived(const tPacketNMEA_Template& valu
 	{
 		const tGnssTaskScriptCmdREQ* Ptr = static_cast<tGnssTaskScriptCmdREQ*>(m_Cmd.get());
 
-		if (value.GetPayload().find(Ptr->RspHead) == 0)
+		if (value.GetPayloadValue().find(Ptr->RspHead) == 0)
 		{
 			////
 			{//[TEST]
 				const auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - m_StartTime).count();//C++11
 				std::stringstream StrTime;
-				StrTime << value.GetPayload() << " --- " << Time_us << " us";
+				StrTime << value.GetPayloadValue() << " --- " << Time_us << " us";
 				m_pObjState->m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightYellow, StrTime.str());
 			}
 			////
 
-			if (value.GetPayload() == Ptr->RspHead + Ptr->RspBody || Ptr->CaseRspWrong.empty())
+			if (value.GetPayloadValue() == Ptr->RspHead + Ptr->RspBody || Ptr->CaseRspWrong.empty())
 			{
 				m_Step = tStep::PauseSet;
 			}
