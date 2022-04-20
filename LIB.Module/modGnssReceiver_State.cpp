@@ -27,7 +27,7 @@ bool tGnssReceiver::tState::operator()()
 
 	if (m_pObj->IsReceivedData())
 	{
-		const utils::tVectorUInt8 DataChunk = m_pObj->GetReceivedDataChunk();
+		utils::tVectorUInt8 DataChunk = m_pObj->GetReceivedDataChunk();
 
 		if (DataChunk.size() > 0)
 		{
@@ -43,7 +43,7 @@ bool tGnssReceiver::tState::operator()()
 	{
 		tPacketNMEA_Template Packet;
 
-		const std::size_t PacketSize = tPacketNMEA_Template::Find(m_ReceivedData, Packet);
+		std::size_t PacketSize = tPacketNMEA_Template::Find(m_ReceivedData, Packet);
 
 		//if something is parsed it's needed to try to parse the rest data because there can be one more packet
 		m_ReceivedData_Parsed = PacketSize == 0;
@@ -75,7 +75,7 @@ void tGnssReceiver::tState::TaskScript()
 {
 	if (m_pCmd == nullptr && !m_TaskScript.empty())
 	{
-		const tGnssTaskScriptCmd* Ptr = m_TaskScript.front().get();
+		tGnssTaskScriptCmd* Ptr = m_TaskScript.front().get();
 
 		if (Ptr != nullptr)
 		{

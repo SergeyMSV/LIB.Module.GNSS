@@ -12,9 +12,7 @@ tGnssReceiver::tStateHalt::tStateHalt(tGnssReceiver* obj, const std::string& val
 tGnssReceiver::tStateHalt::tStateHalt(tGnssReceiver* obj, const std::string& value, bool error)
 	:tState(obj), m_Error(error)
 {
-	std::stringstream SStr;
-	SStr << "tStateHalt: " << value;
-	m_pObj->m_pLog->WriteLine(true, utils::tLogColour::Default, SStr.str());
+	m_pObj->m_pLog->WriteLine(true, utils::tLogColour::Default, "tStateHalt: " + value);
 
 	if (m_pObj->IsControlRestart())
 	{

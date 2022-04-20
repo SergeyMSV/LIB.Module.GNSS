@@ -115,17 +115,17 @@ void tGnssReceiver::SetStrTimePeriod(std::stringstream& stream, const std::chron
 
 void tGnssReceiver::SetStrBaudrate(std::stringstream& stream, const std::chrono::time_point<tClock>& timePoint, std::size_t sizeBytes) const
 {
-	const auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - timePoint).count();//C++11
-	const double Time_ms = static_cast<double>(Time_us) / 1000;//C++11
+	auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - timePoint).count();//C++11
+	double Time_ms = static_cast<double>(Time_us) / 1000;//C++11
 
 	//stream << "; ";
 	stream << sizeBytes << ", ";
 	stream.setf(std::ios::fixed);
-	const int SizeFract = 2;
+	int SizeFract = 2;
 	stream << std::setw(SizeFract + 5) << std::setprecision(SizeFract);
 	stream << Time_ms << " ms, ";
 
-	const double Time_s = Time_ms / 1000;
+	double Time_s = Time_ms / 1000;
 	if (Time_s > 0)
 	{
 		stream.setf(std::ios::fixed);
