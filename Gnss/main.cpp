@@ -5,6 +5,8 @@
 #include <devSettings.h>
 #include <devShell.h>
 
+#include <utilsPath.h>
+
 #include <atomic>
 #include <chrono>
 #include <functional>
@@ -125,7 +127,10 @@ int main(int argc, char* argv[])
 		if (PathFile.has_extension())
 			PathFile.replace_extension();
 
-		const std::string FileNameConf = PathFile.string() + ".conf";
+		std::string FileNameConf = utils::GetPathConfig(PathFile.string());
+		if (FileNameConf.empty())
+			throw std::runtime_error{"config file is not found"};
+
 		dev::g_Settings = dev::tSettings(FileNameConf);
 	}
 	catch (std::exception & e)

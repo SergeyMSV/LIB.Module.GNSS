@@ -77,6 +77,9 @@
     <ClCompile Include="Dev\devGNSS_ModGnssReceiver_Board.cpp">
       <Filter>Dev</Filter>
     </ClCompile>
+    <ClCompile Include="..\LIB.Utils\utilsPath.cpp">
+      <Filter>Lib.Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Lib.Utils\utilsBase.h">
@@ -127,6 +130,9 @@
       <Filter>Lib.Module</Filter>
     </ClInclude>
     <ClInclude Include="..\LIB.Utils\utilsSerialPort.h">
+      <Filter>Lib.Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LIB.Utils\utilsPath.h">
       <Filter>Lib.Utils</Filter>
     </ClInclude>
   </ItemGroup>

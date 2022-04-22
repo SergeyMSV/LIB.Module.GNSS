@@ -26,6 +26,7 @@
                 "Gnss/main.cpp",
 				"LIB.Utils/utilsLog.cpp",
 				"LIB.Utils/utilsPacketNMEAType.cpp",
+				"LIB.Utils/utilsPath.cpp",
 				"LIB.Utils/utilsShell.cpp",
 				"LIB.Module/modGnss.cpp",
 				"LIB.Module/modGnssReceiver.cpp",
