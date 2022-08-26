@@ -4,9 +4,9 @@
         {
             "type": "shell",
             "label": "C/C++: cpp build active file",
-            "command": "/usr/bin/arm-linux-gnueabihf-g++",
+            "command": "/usr/bin/arm-linux-gnueabihf-g++-10",
             "args": [
-				"-std=c++17",
+				"-std=c++2a",
                 "-g",
 				"-Wall",
 				"-I${workspaceFolder}/Gnss",
@@ -40,7 +40,7 @@
 				"LIB.Module/modGnssReceiver_State_CmdGPO.cpp",
 				"LIB.Module/modGnssReceiver_State_CmdREQ.cpp",
                 "-o",
-                "${workspaceFolder}/gnss",
+                "${workspaceFolder}/mxgnss",
 				"-lpthread",
 				"-lboost_filesystem"
             ],
@@ -63,7 +63,7 @@
 			"command": "cp",
 			"args": [
 				"-f",
-				"Gnss/gnss.conf",
+				"Gnss/mxgnss.conf",
 				"."
 			]
 		}

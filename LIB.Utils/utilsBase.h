@@ -1,21 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // utilsBase.h
-//
+// 2014-09-24
 // Standard ISO/IEC 114882, C++17
-//
-// |   version  |    release    | Description
-// |------------|---------------|---------------------------------
-// |            |   2014 09 24  |
-// |            |               | 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include <cassert>
+#include <cctype>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 
 #include <algorithm>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace utils
@@ -74,43 +72,57 @@ typename std::enable_if<std::is_trivially_copyable<T>::value, T>::type Read(cons
 	return Read<T, const char*>(Begin, Begin + dataSize);
 }
 
-enum class tRadix : unsigned char
+enum class tRadix : std::uint8_t
 {
+	//oct = 8,//it's just for tests
 	dec = 10,
 	hex = 16,
+};
+
+template<typename T, typename Iterator, tRadix Radix>
+struct tRead
+{
+	typename std::enable_if<std::is_trivially_copyable<T>::value, T>::type operator()(Iterator first, Iterator last)
+	{
+		assert(false);
+		return 0;//T();//T{};//[TBD] - C++20
+	}
+};
+
+template<typename T, typename Iterator>
+struct tRead<T, Iterator, tRadix::dec>
+{
+	typename std::enable_if<std::is_trivially_copyable<T>::value, T>::type operator()(Iterator first, Iterator last)
+	{
+		std::string ValStr(first, last);
+		ValStr.erase(ValStr.begin(), std::find_if(ValStr.begin(), ValStr.end(), [](char ch) { return std::isdigit(ch) || ch == '-'; }));
+		return static_cast<T>(strtol(ValStr.c_str(), nullptr, 10));
+	}
+};
+
+template<typename T, typename Iterator>
+struct tRead<T, Iterator, tRadix::hex>
+{
+	typename std::enable_if<std::is_trivially_copyable<T>::value, T>::type operator()(Iterator first, Iterator last)
+	{
+		std::string ValStr(first, last);
+		ValStr.erase(ValStr.begin(), std::find_if(ValStr.begin(), ValStr.end(), [](char ch) { return std::isxdigit(ch); }));
+		return static_cast<T>(strtoul(ValStr.c_str(), nullptr, 16));
+	}
 };
 
 template<typename T, typename Iterator, int N = 20>
 typename std::enable_if<std::is_trivially_copyable<T>::value, T>::type Read(Iterator first, Iterator last, tRadix radix)
 {
-	char Str[N];//[#] and +/- and 0x00
-
-	std::size_t StrIndex = 0;
-
-	for (; first != last && StrIndex < sizeof(Str) - 1; ++first)
+	switch (radix)
 	{
-		char Byte = static_cast<char>(*first);
-
-		if ((Byte >= '0' && Byte <= '9') ||
-			(radix == tRadix::dec && Byte == '-' && StrIndex == 0) ||
-			(radix == tRadix::hex && ((Byte >= 'A' && Byte <= 'F') || (Byte >= 'a' && Byte <= 'f'))))
-		{
-			Str[StrIndex++] = Byte;
-		}
-		else if (StrIndex != 0)
-		{
-			break;
-		}
+	//case tRadix::oct: return tRead<T, Iterator, tRadix::oct>()(first, last);
+	case tRadix::dec: return tRead<T, Iterator, tRadix::dec>()(first, last);
+	case tRadix::hex: return tRead<T, Iterator, tRadix::hex>()(first, last);
+	default:
+		assert(false);
+		return 0;
 	}
-
-	Str[StrIndex] = 0;
-
-	if (Str[0] == '-' && radix == tRadix::dec)
-	{
-		return static_cast<T>(strtol(Str, 0, static_cast<int>(radix)));
-	}
-
-	return static_cast<T>(strtoul(Str, 0, static_cast<int>(radix)));
 }
 
 template<typename T>
@@ -189,9 +201,6 @@ protected:
 	~tEmptyAble() {}
 };
 
-//char FromBCD(char dataBCD); [TBD]
-//char ToBCD(char dataBCD); [TBD]
-
 enum class tDevStatus : std::uint8_t
 {
 	Init,
@@ -234,6 +243,72 @@ enum class tExitCode : int
 	EX_NOPERM = 77,		// permission denied
 	EX_CONFIG = 78,		// configuration error
 	EX__MAX = 78,		// maximum listed value
+};
+
+struct tVersion // 1.0.234
+{
+	std::uint16_t Major = 0;
+	std::uint16_t Minor = 0;
+	std::uint16_t Build = 0;
+
+	tVersion() = default;
+	tVersion(std::uint16_t major, std::uint16_t minor, std::uint16_t build)
+		:Major(major), Minor(minor), Build(build)
+	{
+	}
+	explicit tVersion(const std::string& strVersion)
+	{
+		if (!TryParse(strVersion, *this))
+			throw std::runtime_error("format");
+	}
+
+	bool operator==(const tVersion& val) const
+	{
+		return Major == val.Major && Minor == val.Minor && Build == val.Build;
+	}
+	bool operator!=(const tVersion& val) const
+	{
+		return !operator==(val);
+	}
+	//bool operator==(const tVersion&)const = default;//[TBD] - C++20 set at the beginning of the file
+	//bool operator!=(const tVersion&)const = default;
+
+	static bool TryParse(const std::string& strVersion, tVersion& version)
+	{
+		version = tVersion{};
+
+		auto IsNotVersionSymbol = [](char ch)->bool {return !isdigit(ch) && ch != '.'; };
+
+		std::string Value = strVersion;
+		Value.erase(std::remove_if(Value.begin(), Value.end(), IsNotVersionSymbol), Value.end());
+
+		const std::size_t Part1Begin = 0;
+		const std::size_t Part1End = Value.find('.');
+		const std::size_t Part2Begin = Part1End + 1;
+		const std::size_t Part2End = Value.find('.', Part2Begin);
+		const std::size_t Part3Begin = Part2End + 1;
+		const std::size_t Part3End = Value.size() - 1;
+
+		if (Part1End == std::string::npos || Part2End == std::string::npos || Part2End == Value.size() - 1)
+			return false;
+
+		auto GetFigure = [&Value](std::size_t begin, std::size_t end)->long
+		{
+			std::string SubStr = Value.substr(begin, end);
+			return std::strtol(SubStr.c_str(), nullptr, 10);
+		};
+
+		version.Major = static_cast<std::uint16_t>(GetFigure(Part1Begin, Part1End));
+		version.Minor = static_cast<std::uint16_t>(GetFigure(Part2Begin, Part2End));
+		version.Build = static_cast<std::uint16_t>(GetFigure(Part3Begin, Part3End));
+
+		return true;
+	}
+
+	std::string ToString()
+	{
+		return std::to_string(Major) + "." + std::to_string(Minor) + "." + std::to_string(Build);
+	}
 };
 
 }

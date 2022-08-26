@@ -1,32 +1,25 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// devShared.h
-//
-// Standard ISO/IEC 114882, C++11
-//
-// |   version  |    release    | Description
-// |------------|---------------|---------------------------------
-// |      1     |   2020 03 05  |
-// |            |               | 
+// devDataSet.h
+// 2020-03-05
+// Standard ISO/IEC 114882, C++17
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include <mutex>
-#include <string>//[TBD]TEST
+#include <string>
 
 namespace dev
 {
 
-//typedef tGNSS_State utils::
-
 struct DataSetGNSSData
 {
-	//date time
 	double Latitude = 0;
 	double Longitude = 0;
 	double Altitude = 0;
 	double Speed = 0;
 	double Course = 0;
 
+	DataSetGNSSData() = default;
 	DataSetGNSSData(double latitude, double longitude, double altitude, double speed, double course)
 	{
 		Latitude = latitude;
@@ -36,20 +29,8 @@ struct DataSetGNSSData
 		Course = course;
 	}
 
-	bool operator == (const DataSetGNSSData& value)
-	{
-		return
-			Latitude == value.Latitude &&
-			Longitude == value.Longitude &&
-			Altitude == value.Altitude &&
-			Speed == value.Speed &&
-			Course == value.Course;
-	}
-
-	bool operator != (const DataSetGNSSData& value)
-	{
-		return !operator==(value);
-	}
+	bool operator == (const DataSetGNSSData&) const = default;
+	bool operator != (const DataSetGNSSData&) const = default;
 };
 
 class tDataSet
@@ -71,7 +52,5 @@ public:
 	std::string GetDataValue1() const;
 	void SetDataValue1(const std::string& value);
 };
-
-//extern tDataSet g_DataSet;
 
 }

@@ -13,7 +13,7 @@
             "defines": [],
             "compilerPath": "/usr/bin/arm-linux-gnueabihf-gcc",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "intelliSenseMode": "gcc-x64"
         }
     ],

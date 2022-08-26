@@ -140,7 +140,7 @@
     <Text Include="Readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="gnss.conf" />
+    <Xml Include="mxgnss.conf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LIB.Utils\!Refresh.bat">
