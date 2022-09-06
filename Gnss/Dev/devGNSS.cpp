@@ -71,14 +71,14 @@ bool tGNSS::StartUserTaskScript(const std::string& taskScriptID)
 	return false;
 }
 
-mod::tGnssStatus tGNSS::GetStatus() const
+utils::tDevStatus tGNSS::GetStatus() const
 {
 	if (m_pMod)
 	{
 		return m_pMod->GetStatus();
 	}
 
-	return mod::tGnssStatus::Unknown;
+	return utils::tDevStatus::Unknown;
 }
 
 std::string tGNSS::GetLastErrorMsg() const

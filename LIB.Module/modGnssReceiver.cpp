@@ -51,7 +51,7 @@ bool tGnssReceiver::StartUserTaskScript(const std::string& taskScriptID)
 	return m_pState->SetUserTaskScript(taskScriptID);
 }
 
-tGnssStatus tGnssReceiver::GetStatus() const
+tGnssReceiver::tDevStatus tGnssReceiver::GetStatus() const
 {
 	//std::lock_guard<std::mutex> Lock(m_MtxState);
 

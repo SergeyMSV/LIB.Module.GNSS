@@ -92,7 +92,7 @@ public:
 
 	bool StartUserTaskScript(const std::string& taskScriptID);
 
-	mod::tGnssStatus GetStatus() const;
+	utils::tDevStatus GetStatus() const;
 	std::string GetLastErrorMsg() const;
 
 	//tModGnssReceiver* operator->()//[TEST]

@@ -85,25 +85,6 @@ typedef std::deque<std::unique_ptr<tGnssTaskScriptCmd>> tGnssTaskScript;
 typedef utils::packet_NMEA::Type::tGNSS_State tGNSS_State;
 typedef utils::packet_NMEA::Type::tSatellite tGNSS_Satellite;
 
-enum class tGnssStatus : std::uint8_t
-{
-	Init,
-	Operation,
-	Deinit,
-	Halted,
-	Error,
-	Unknown = 0xFF,
-};
-
-//enum class tGnssError : std::uint8_t
-//{
-//	OK,
-//
-//	State_ErrTimer,
-//
-//	Unknown = 0xFF,
-//};
-
 struct tGnssDataSet
 {
 	tGNSS_State GNSS = tGNSS_State::UNKNOWN;

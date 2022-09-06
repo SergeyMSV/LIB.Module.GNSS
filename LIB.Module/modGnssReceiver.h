@@ -33,6 +33,7 @@ typedef utils::packet_NMEA::tPayloadGSV tMsgGSV;
 
 class tGnssReceiver
 {
+	using tDevStatus = utils::tDevStatus;
 	using tClock = std::chrono::steady_clock;//C++11
 
 	class tStateError;
@@ -133,7 +134,7 @@ class tGnssReceiver
 		virtual bool Start() { return false; }
 		virtual bool Halt();
 
-		virtual tGnssStatus GetStatus() = 0;
+		virtual tDevStatus GetStatus() = 0;
 
 		virtual bool SetUserTaskScript(const std::string& taskScriptID) { return false; }
 
@@ -166,7 +167,7 @@ class tGnssReceiver
 
 		bool Halt() override { return false; }
 
-		tGnssStatus GetStatus() override { return tGnssStatus::Error; }
+		tDevStatus GetStatus() override { return tDevStatus::Error; }
 
 	protected:
 		bool OnCmdFailed() override;//ChangeState - if ChangeState is inside then return is true
@@ -186,7 +187,7 @@ class tGnssReceiver
 		bool Start() override { return false; }
 		bool Halt() override { return true; }
 
-		tGnssStatus GetStatus() override { return tGnssStatus::Halted; }
+		tDevStatus GetStatus() override { return tDevStatus::Halted; }
 
 	protected:
 		bool Go() override;
@@ -203,7 +204,7 @@ class tGnssReceiver
 	public:
 		explicit tStateOperation(tGnssReceiver* obj);
 
-		tGnssStatus GetStatus() override { return tGnssStatus::Operation; }
+		tDevStatus GetStatus() override { return tDevStatus::Operation; }
 
 		bool SetUserTaskScript(const std::string& taskScriptID) override;
 
@@ -222,7 +223,7 @@ class tGnssReceiver
 	public:
 		tStateStart(tGnssReceiver* obj, const std::string& value);
 
-		tGnssStatus GetStatus() override { return tGnssStatus::Init; }
+		tDevStatus GetStatus() override { return tDevStatus::Init; }
 
 	protected:
 		void OnTaskScriptDone() override;
@@ -237,7 +238,7 @@ class tGnssReceiver
 		bool Start() override { return false; }
 		bool Halt() override { return true; }
 
-		tGnssStatus GetStatus() override { return tGnssStatus::Deinit; }
+		tDevStatus GetStatus() override { return tDevStatus::Deinit; }
 
 	protected:
 		void OnTaskScriptDone() override;
@@ -276,7 +277,7 @@ public:
 
 	bool StartUserTaskScript(const std::string& taskScriptID);
 
-	tGnssStatus GetStatus() const;
+	tDevStatus GetStatus() const;
 	std::string GetLastErrorMsg() const;
 
 protected:
