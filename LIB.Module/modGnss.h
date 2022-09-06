@@ -1,12 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // modGnss.h
-//
+// 2020-04-28
 // Standard ISO/IEC 114882, C++11
-//
-// |   version  |    release    | Description
-// |------------|---------------|---------------------------------
-// |      1     |   2020 04 28  |
-// |            |               | 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
@@ -139,24 +134,21 @@ struct tGnssDataSet
 	std::string ToString() const
 	{
 		std::stringstream Stream;
+		Stream.setf(std::ios::fixed);
+		Stream.fill('0');
 
-		Stream << std::setfill('0');
 		Stream << std::setw(2) << static_cast<int>(Hour);
 		Stream << std::setw(2) << static_cast<int>(Minute);
 
-		Stream.setf(std::ios::fixed);
-
-		Stream << std::setw(2 + SizeFractTime + 1) << std::setprecision(SizeFractTime) << Second;
+		Stream.precision(SizeFractTime);
+		Stream << std::setw(2 + SizeFractTime + 1) << Second;
 
 		Stream << " " << (Valid ? 'A' : 'V');
 
-
-		Stream.setf(std::ios::fixed);
-
-		Stream << " " << std::setw(2 + SizeFract + 1) << std::setprecision(SizeFract) << Latitude;
-		Stream << " " << std::setw(2 + SizeFract + 1) << std::setprecision(SizeFract) << Longitude;
-		Stream << " " << std::setw(2 + SizeFract + 1) << std::setprecision(SizeFract) << Altitude;
-
+		Stream.precision(SizeFract);
+		Stream << " " << std::setw(2 + SizeFract + 1) << Latitude;
+		Stream << " " << std::setw(2 + SizeFract + 1) << Longitude;
+		Stream << " " << std::setw(2 + SizeFract + 1) << Altitude;
 
 		Stream << " " << Satellite.size();
 
@@ -167,40 +159,30 @@ struct tGnssDataSet
 	std::string ToJSON() const
 	{
 		std::stringstream Stream;
+		Stream.setf(std::ios::fixed);
+		Stream.fill('0');
+
 		Stream << "{\n";
-		//Stream << " \"gnss\": \"" <<utils::packet_NMEA::Type::tGNSS(GNSS).ToString() << "\",\n";
 		Stream << " \"utc\": \"";
-		Stream << std::setfill('0');
 		Stream << std::setw(2) << static_cast<int>(Day) << ".";
 		Stream << std::setw(2) << static_cast<int>(Month) << ".";
 		Stream << std::setw(2) << static_cast<int>(Year) << " ";
 		Stream << std::setw(2) << static_cast<int>(Hour) << ".";
 		Stream << std::setw(2) << static_cast<int>(Minute) << ".";
-		Stream.setf(std::ios::fixed);
-		Stream << std::setw(2 + SizeFractTime + 1) << std::setprecision(SizeFractTime) << Second;
+		Stream.precision(SizeFractTime);
+		Stream << std::setw(2 + SizeFractTime + 1) << Second;
 		Stream << "\",\n";
 		Stream << " \"valid\": \"" << (Valid ? '1' : '0') << "\",\n";
 
-		Stream.setf(std::ios::fixed);
+		Stream.precision(SizeFractPosition);
+		Stream << " \"latitude\": \"" << Latitude << "\",\n";
+		Stream << " \"longitude\": \"" << Longitude << "\",\n";
+		Stream << " \"altitude\": \"" << Altitude << "\",\n";
 
-		Stream << " \"latitude\": \"";
-		Stream << std::setprecision(SizeFractPosition) << Latitude;
-		Stream << "\",\n";
-		Stream << " \"longitude\": \"";
-		Stream << std::setprecision(SizeFractPosition) << Longitude;
-		Stream << "\",\n";
-		Stream << " \"altitude\": \"";
-		Stream << std::setprecision(SizeFractPosition) << Altitude;
-		Stream << "\",\n";
+		Stream.precision(2);
+		Stream << " \"speed\": \"" << Speed << "\",\n";
+		Stream << " \"course\": \"" << Course << "\",\n";
 
-		const int FixedFract = 2;
-		Stream << " \"speed\": \"";
-		Stream << std::setprecision(FixedFract) << Speed;
-		Stream << "\",\n";
-		Stream << " \"course\": \"";
-		Stream << std::setprecision(FixedFract) << Course;
-		Stream << "\",\n";
-		
 		Stream << " \"satellite\": [\n";
 		for (std::size_t i = 0; i < Satellite.size(); ++i)
 		{
