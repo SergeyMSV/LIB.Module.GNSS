@@ -3,6 +3,7 @@ del /Q *.h
 
 xcopy /Y %LIB_UTILS%\utilsBase.*
 xcopy /Y %LIB_UTILS%\utilsCRC.*
+xcopy /Y %LIB_UTILS%\utilsLinux.*
 xcopy /Y %LIB_UTILS%\utilsLog.*
 xcopy /Y %LIB_UTILS%\utilsPacket.*
 xcopy /Y %LIB_UTILS%\utilsPacketNMEA.*

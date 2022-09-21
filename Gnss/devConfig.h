@@ -23,3 +23,5 @@ struct tDataSetMainControl
 	mutable std::mutex Thread_GNSS_State_UserTaskScriptIDMtx;
 	std::string Thread_GNSS_State_UserTaskScriptID;
 };
+
+constexpr char g_FileNameTempPrefix[] = "_";

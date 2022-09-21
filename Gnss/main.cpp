@@ -5,6 +5,7 @@
 #include <devSettings.h>
 #include <devShell.h>
 
+#include <utilsLinux.h>
 #include <utilsPath.h>
 
 #include <atomic>
@@ -146,6 +147,11 @@ int main(int argc, char* argv[])
 
 	if (ShellEnabled)
 		Thread_Shell = std::thread(dev::ThreadFunShell);
+	////////////////////////////////
+
+	utils::RemoveFilesOutdated(dev::g_Settings.Output.Path, dev::g_Settings.Output.Prefix, dev::g_Settings.Output.QtyMax);
+	utils::RemoveFilesOutdated(dev::g_Settings.Output.Path, g_FileNameTempPrefix + dev::g_Settings.Output.Prefix, 0);
+
 	////////////////////////////////
 
 	std::promise<bool> Thread_GNSS_Promise;

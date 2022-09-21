@@ -38,7 +38,8 @@ struct tSettings
 	struct
 	{
 		std::string Path;
-		std::string FileName;
+		std::string Prefix;
+		uint8_t QtyMax = 0;
 	}Output;
 
 private:

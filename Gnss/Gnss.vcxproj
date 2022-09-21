@@ -193,6 +193,7 @@
     <ClCompile Include="..\Lib.Module\modGnssReceiver_State_CmdGPI.cpp" />
     <ClCompile Include="..\Lib.Module\modGnssReceiver_State_CmdGPO.cpp" />
     <ClCompile Include="..\Lib.Module\modGnssReceiver_State_CmdREQ.cpp" />
+    <ClCompile Include="..\LIB.Utils\utilsLinux.cpp" />
     <ClCompile Include="..\Lib.Utils\utilsLog.cpp" />
     <ClCompile Include="..\LIB.Utils\utilsPacketNMEAType.cpp" />
     <ClCompile Include="..\LIB.Utils\utilsPath.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\Lib.Module\modGnssReceiver.h" />
     <ClInclude Include="..\Lib.Utils\utilsBase.h" />
     <ClInclude Include="..\Lib.Utils\utilsCRC.h" />
+    <ClInclude Include="..\LIB.Utils\utilsLinux.h" />
     <ClInclude Include="..\Lib.Utils\utilsLog.h" />
     <ClInclude Include="..\Lib.Utils\utilsPacket.h" />
     <ClInclude Include="..\Lib.Utils\utilsPacketNMEA.h" />

@@ -1,5 +1,7 @@
 #include "devSettings.h"
 
+#include <utilsLinux.h>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -20,8 +22,10 @@ tSettings::tSettings(const std::string& fileName)
 
 		if (ValueIter->first == "<xmlattr>")
 		{
-			Output.Path = ValueIter->second.get<std::string>("Path");
-			Output.FileName = ValueIter->second.get<std::string>("FileName");
+			std::string PathRaw = ValueIter->second.get<std::string>("Path");
+			Output.Path = utils::linux::GetPath(PathRaw);
+			Output.Prefix = ValueIter->second.get<std::string>("Prefix");
+			Output.QtyMax = ValueIter->second.get<uint8_t>("QtyMax");
 		}
 	}
 

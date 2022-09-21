@@ -273,6 +273,27 @@ struct tVersion // 1.0.234
 	//bool operator==(const tVersion&)const = default;//[TBD] - C++20 set at the beginning of the file
 	//bool operator!=(const tVersion&)const = default;
 
+	bool operator<(const tVersion& val) const
+	{
+		if (Major < val.Major)
+			return true;
+
+		if (Minor < val.Minor)
+			return true;
+
+		return Build < val.Build;
+	}
+	bool operator>(const tVersion& val) const
+	{
+		if (Major > val.Major)
+			return true;
+
+		if (Minor > val.Minor)
+			return true;
+
+		return Build > val.Build;
+	}
+
 	static bool TryParse(const std::string& strVersion, tVersion& version)
 	{
 		version = tVersion{};

@@ -2,6 +2,8 @@
 #include "devDataSet.h"
 #include "devSettings.h"
 
+#include <utilsPath.h>
+
 #include <cstdio>
 #include <fstream>
 
@@ -31,16 +33,25 @@ mod::tGnssSettingsNMEA tGNSS::tModGnssReceiver::GetSettingsNMEA()
 
 void tGNSS::tModGnssReceiver::OnChanged(const mod::tGnssDataSet& value)
 {
-	const std::string FileName = g_Settings.Output.Path + "/" + g_Settings.Output.FileName;
-	const std::string FileNameTemp = FileName + ".tmp";
+	std::string DTStr = utils::GetDateTime();
+	std::string Path = g_Settings.Output.Path + "/";
+	std::string FileName = g_Settings.Output.Prefix + DTStr + ".json";
+	std::string FileNameFull = Path + FileName;
+	std::string FileNameTemp = Path + g_FileNameTempPrefix + FileName + ".tmp";
 	std::fstream File = std::fstream(FileNameTemp, std::ios::out);
-	if (File.is_open())
+	if (!File.good())
 	{
-		File << value.ToJSON();
-		File.close();
+		m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightYellow, "Open File Error: " + FileNameTemp);
+		m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightYellow, value.ToJSON());
+		return;
 	}
-	std::remove(FileName.c_str());
-	std::rename(FileNameTemp.c_str(), FileName.c_str());
+
+	File << value.ToJSON();
+	File.close();
+	
+	std::rename(FileNameTemp.c_str(), FileNameFull.c_str());
+
+	utils::RemoveFilesOutdated(g_Settings.Output.Path, g_Settings.Output.Prefix, g_Settings.Output.QtyMax);
 
 	m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightYellow, value.ToJSON());
 }
