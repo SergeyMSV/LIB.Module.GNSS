@@ -153,25 +153,25 @@ struct tGnssDataSet
 		Stream.precision(SizeFractTime);
 		Stream << std::setw(2 + SizeFractTime + 1) << Second;
 		Stream << "\",\n";
-		Stream << " \"valid\": \"" << (Valid ? '1' : '0') << "\",\n";
+		Stream << " \"valid\": " << (Valid ? '1' : '0') << ",\n";
 
 		Stream.precision(SizeFractPosition);
-		Stream << " \"latitude\": \"" << Latitude << "\",\n";
-		Stream << " \"longitude\": \"" << Longitude << "\",\n";
-		Stream << " \"altitude\": \"" << Altitude << "\",\n";
+		Stream << " \"latitude\": " << Latitude << ",\n";
+		Stream << " \"longitude\": " << Longitude << ",\n";
+		Stream << " \"altitude\": " << Altitude << ",\n";
 
 		Stream.precision(2);
-		Stream << " \"speed\": \"" << Speed << "\",\n";
-		Stream << " \"course\": \"" << Course << "\",\n";
+		Stream << " \"speed\": " << Speed << ",\n";
+		Stream << " \"course\": " << Course << ",\n";
 
 		Stream << " \"satellite\": [\n";
 		for (std::size_t i = 0; i < Satellite.size(); ++i)
 		{
 			Stream << "  {\n";
-			Stream << "   \"id\": \"" << static_cast<int>(Satellite[i].ID.Value) << "\",\n";
-			Stream << "   \"elevation\": \"" << static_cast<int>(Satellite[i].Elevation.Value) << "\",\n";
-			Stream << "   \"azimuth\": \"" << static_cast<int>(Satellite[i].Azimuth.Value) << "\",\n";
-			Stream << "   \"snr\": \"" << static_cast<int>(Satellite[i].SNR.Value) << "\"\n";
+			Stream << "   \"id\": " << static_cast<int>(Satellite[i].ID.Value) << ",\n";
+			Stream << "   \"elevation\": " << static_cast<int>(Satellite[i].Elevation.Value) << ",\n";
+			Stream << "   \"azimuth\": " << static_cast<int>(Satellite[i].Azimuth.Value) << ",\n";
+			Stream << "   \"snr\": " << static_cast<int>(Satellite[i].SNR.Value) << "\n";
 			Stream << "  }";
 			if (i < Satellite.size() - 1)
 			{
