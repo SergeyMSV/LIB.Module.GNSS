@@ -38,6 +38,12 @@ bool tGnssReceiver::tStateOperation::Go()
 		return true;
 	}
 
+	if (m_SettingsNMEA.IsWrong())
+	{
+		ChangeState(new tStateError(m_pObj, "operation: config is wrong"));
+		return true;
+	}
+
 	auto Time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(tClock::now() - m_StartTime).count();//C++11
 	double Time_us = static_cast<double>(Time_ns) / 1000;//C++11
 	if (Time_us > m_SettingsNMEA.PeriodMax)
@@ -60,6 +66,32 @@ void SetParam(T& valDst, U valSrc, bool& check)
 	{
 		valDst = valSrc.Value;
 	}
+}
+
+template<class T>
+void SetDataSetNMEA_RMC(const T& packRMC, tGnssDataSet& dataSet)
+{
+	if (!packRMC.Date.Empty())
+	{
+		dataSet.Year = packRMC.Date.Year;
+		dataSet.Month = packRMC.Date.Month;
+		dataSet.Day = packRMC.Date.Day;
+	}
+
+	if (!packRMC.Time.Empty())
+	{
+		dataSet.Hour = packRMC.Time.Hour;
+		dataSet.Minute = packRMC.Time.Minute;
+		dataSet.Second = packRMC.Time.Second;
+	}
+
+	dataSet.Check_DateTime = !packRMC.Date.Empty() && !packRMC.Time.Empty();
+
+	SetParam(dataSet.Valid, packRMC.Valid, dataSet.Check_Position);
+	SetParam(dataSet.Latitude, packRMC.Latitude, dataSet.Check_Position);
+	SetParam(dataSet.Longitude, packRMC.Longitude, dataSet.Check_Position);
+	SetParam(dataSet.Speed, packRMC.Speed, dataSet.Check_Position);
+	SetParam(dataSet.Course, packRMC.Course, dataSet.Check_Position);
 }
 
 void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& value)
@@ -91,31 +123,22 @@ void tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& valu
 		m_pObj->m_pLog->Write(true, utils::tLogColour::LightMagenta, PacketData.Value[0] + " " + Msg.MsgQty.ToString() + " " + Msg.MsgNum.ToString() + " " + Msg.SatelliteQty.ToString());
 		m_pObj->m_pLog->WriteLine(false, utils::tLogColour::Default, StrTime.str());
 	}
-	else if (tMsgRMC::Try(PacketData.Value))
+	else if (m_SettingsNMEA.LatLonFract == 4 && tMsgRMC_Ft4::Try(PacketData.Value))
 	{
-		tMsgRMC Msg(PacketData.Value);
+		tMsgRMC_Ft4 Msg(PacketData.Value);
+		SetDataSetNMEA_RMC(Msg, m_DataSet);
 
-		if (!Msg.Date.Empty())
-		{
-			m_DataSet.Year = Msg.Date.Year;
-			m_DataSet.Month = Msg.Date.Month;
-			m_DataSet.Day = Msg.Date.Day;
-		}
+		StrTime << "; ";
+		m_pObj->SetStrTimePeriod(StrTime, m_StartTime);
+		m_StartTime = tClock::now();
 
-		if (!Msg.Time.Empty())
-		{
-			m_DataSet.Hour = Msg.Time.Hour;
-			m_DataSet.Minute = Msg.Time.Minute;
-			m_DataSet.Second = Msg.Time.Second;
-		}
-
-		m_DataSet.Check_DateTime = !Msg.Date.Empty() && !Msg.Time.Empty();
-
-		SetParam(m_DataSet.Valid, Msg.Valid, m_DataSet.Check_Position);
-		SetParam(m_DataSet.Latitude, Msg.Latitude, m_DataSet.Check_Position);
-		SetParam(m_DataSet.Longitude, Msg.Longitude, m_DataSet.Check_Position);
-		SetParam(m_DataSet.Speed, Msg.Speed, m_DataSet.Check_Position);
-		SetParam(m_DataSet.Course, Msg.Course, m_DataSet.Check_Position);
+		m_pObj->m_pLog->Write(true, utils::tLogColour::LightMagenta, PacketData.Value[0] + " " + Msg.Date.ToString() + " " + Msg.Time.ToString());
+		m_pObj->m_pLog->WriteLine(false, utils::tLogColour::Default, StrTime.str());
+	}
+	else if (m_SettingsNMEA.LatLonFract == 6 && tMsgRMC_Ft6::Try(PacketData.Value))
+	{
+		tMsgRMC_Ft6 Msg(PacketData.Value);
+		SetDataSetNMEA_RMC(Msg, m_DataSet);
 
 		StrTime << "; ";
 		m_pObj->SetStrTimePeriod(StrTime, m_StartTime);

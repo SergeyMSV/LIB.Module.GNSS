@@ -122,6 +122,7 @@ mod::tGnssSettingsNMEA tSettings::GetSettingsNMEA() const
 		if (ValueIter->first == "<xmlattr>")
 		{
 			Settings.PeriodMax = ValueIter->second.get<std::uint32_t>("PeriodMAX_us");
+			Settings.LatLonFract = ValueIter->second.get<std::uint8_t>("LatLonFract");
 		}
 
 		for (auto i : *Value)

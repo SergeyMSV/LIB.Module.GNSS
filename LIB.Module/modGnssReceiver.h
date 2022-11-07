@@ -28,7 +28,8 @@ namespace mod
 
 typedef utils::packet::tPacket<utils::packet_NMEA::tFormatNMEA, utils::packet_NMEA::tPayloadCommon> tPacketNMEA;
 typedef utils::packet::tPacket<utils::packet_NMEA::tFormatNMEA, utils::packet_NMEA::tPayloadString> tPacketNMEA_Template;
-typedef utils::packet_NMEA::tPayloadRMC<13, 3, LIB_MOD_GNSS_LatitudeSizeFract, LIB_MOD_GNSS_LongitudeSizeFract> tMsgRMC;
+typedef utils::packet_NMEA::tPayloadRMC<13, 3, 4, 4> tMsgRMC_Ft4;
+typedef utils::packet_NMEA::tPayloadRMC<13, 3, 6, 6> tMsgRMC_Ft6;
 typedef utils::packet_NMEA::tPayloadGSV tMsgGSV;
 
 class tGnssReceiver

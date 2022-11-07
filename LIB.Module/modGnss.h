@@ -190,6 +190,15 @@ struct tGnssSettingsNMEA
 {
 	std::string MsgLast;
 	std::uint32_t PeriodMax = 0;
+	std::uint8_t LatLonFract = 0;
+
+	bool IsWrong() const
+	{
+		return
+			MsgLast.empty() ||
+			PeriodMax == 0 ||
+			(LatLonFract != 4 && LatLonFract != 6);
+	}
 };
 
 }
