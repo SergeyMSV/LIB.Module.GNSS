@@ -1,12 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // modGnssReceiver.h
-//
-// Standard ISO/IEC 114882, C++11
-//
-// |   version  |    release    | Description
-// |------------|---------------|---------------------------------
-// |      1     |   2020 03 03  |
-// |            |               | 
+// 2020-03-03
+// Standard ISO/IEC 114882, C++14
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
@@ -32,10 +27,11 @@ typedef utils::packet_NMEA::tPayloadRMC<13, 3, 4, 4> tMsgRMC_Ft4;
 typedef utils::packet_NMEA::tPayloadRMC<13, 3, 6, 6> tMsgRMC_Ft6;
 typedef utils::packet_NMEA::tPayloadGSV tMsgGSV;
 
+using tClock = std::chrono::steady_clock;
+
 class tGnssReceiver
 {
 	using tDevStatus = utils::tDevStatus;
-	using tClock = std::chrono::steady_clock;//C++11
 
 	class tStateError;
 
@@ -156,7 +152,7 @@ class tGnssReceiver
 		virtual void OnTaskScriptFailed(const std::string& msg) {};//ChangeState
 
 		virtual bool Go() { return true; }//ChangeState
-		virtual void OnReceived(const tPacketNMEA_Template& value);// {}//ChangeState
+		virtual bool OnReceived(const tPacketNMEA_Template& value);// {}//ChangeState
 
 		void ChangeState(tState* state) { m_pObj->ChangeState(state); }
 	};
@@ -214,7 +210,7 @@ class tGnssReceiver
 		void OnTaskScriptFailed(const std::string& msg) override;
 
 		bool Go() override;
-		void OnReceived(const tPacketNMEA_Template& value) override;
+		bool OnReceived(const tPacketNMEA_Template& value) override;
 	};
 
 	class tStateStart :public tState
@@ -311,10 +307,31 @@ private:
 
 	void ClearReceivedData();
 
-	void SetStrTimePeriod(std::stringstream& stream, const std::chrono::time_point<tClock>& timePoint) const;
-	void SetStrBaudrate(std::stringstream& stream, const std::chrono::time_point<tClock>& timePoint, std::size_t sizeBytes) const;
-
 	void ChangeState(tState* state);
+};
+
+class tGnssReceiverPacketLog
+{
+	utils::tLog* m_pLog = nullptr;
+
+	std::chrono::time_point<tClock>& m_StartTime;
+	std::string m_MsgTime;
+
+public:
+	tGnssReceiverPacketLog() = delete;
+	tGnssReceiverPacketLog(utils::tLog* log, std::chrono::time_point<tClock>& startTime);
+	~tGnssReceiverPacketLog();
+
+	void OnReceived(size_t size);
+	void OnReceived(const std::string& id, const tMsgGSV& msg);
+	void OnReceived(const std::string& id, const tMsgRMC_Ft4& msg);
+	void OnReceived(const std::string& id, const tMsgRMC_Ft6& msg);
+	void OnReceived(const std::string& id);
+
+private:
+	void Write(utils::tLogColour colour, const std::string& msg);
+	std::string GetTimePeriodString(const std::chrono::time_point<tClock>& timePoint) const;
+	std::string GetBaudrateString(const std::chrono::time_point<tClock>& timePoint, std::size_t sizeBytes) const;
 };
 
 }

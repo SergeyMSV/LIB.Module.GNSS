@@ -33,7 +33,7 @@ bool tGnssReceiver::tState::operator()()
 		{
 			m_pObj->m_pLog->WriteHex(true, utils::tLogColour::LightRed, "Received", DataChunk);
 
-			m_ReceivedData.insert(m_ReceivedData.end(), DataChunk.cbegin(), DataChunk.cend());//C++14
+			m_ReceivedData.insert(m_ReceivedData.end(), DataChunk.cbegin(), DataChunk.cend());
 
 			m_ReceivedData_Parsed = false;
 		}		
@@ -53,14 +53,16 @@ bool tGnssReceiver::tState::operator()()
 			if (m_pCmd && m_pCmd->OnReceived(Packet))//ChangeState
 				return true;
 
-			OnReceived(Packet);//ChangeState
-			return true;
+			if(OnReceived(Packet))//ChangeState
+				return true;
 		}
+	}
+	else
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
 	TaskScript();
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 	return Go();//ChangeState
 }
@@ -135,7 +137,7 @@ void tGnssReceiver::tState::OnCmdTaskScript(std::unique_ptr<tGnssTaskScriptCmd> 
 
 		tGnssTaskScript Script = m_pObj->GetTaskScript(taskScriptID, false);
 
-		for (tGnssTaskScript::reverse_iterator i = Script.rbegin(); i != Script.rend(); ++i)//C++11
+		for (tGnssTaskScript::reverse_iterator i = Script.rbegin(); i != Script.rend(); ++i)
 		{
 			m_TaskScript.push_front(std::move(*i));
 		}
@@ -180,9 +182,10 @@ bool tGnssReceiver::tState::OnCmdFailed()
 	return true;
 }
 
-void tGnssReceiver::tState::OnReceived(const tPacketNMEA_Template& value)
+bool tGnssReceiver::tState::OnReceived(const tPacketNMEA_Template& value)
 {
 	m_pObj->m_pLog->WriteLine(false, utils::tLogColour::LightYellow, "OnReceived: " + value.GetPayloadValue());
+	return false;
 }
 
 }
