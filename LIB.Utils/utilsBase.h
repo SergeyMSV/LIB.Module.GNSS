@@ -275,23 +275,27 @@ struct tVersion // 1.0.234
 
 	bool operator<(const tVersion& val) const
 	{
-		if (Major < val.Major)
-			return true;
-
-		if (Minor < val.Minor)
-			return true;
-
-		return Build < val.Build;
+		if (Major == val.Major)
+		{
+			if (Minor == val.Minor)
+			{
+				return Build < val.Build;
+			}
+			return Minor < val.Minor;
+		}
+		return Major < val.Major;
 	}
 	bool operator>(const tVersion& val) const
 	{
-		if (Major > val.Major)
-			return true;
-
-		if (Minor > val.Minor)
-			return true;
-
-		return Build > val.Build;
+		if (Major == val.Major)
+		{
+			if (Minor == val.Minor)
+			{
+				return Build > val.Build;
+			}
+			return Minor > val.Minor;
+		}
+		return Major > val.Major;
 	}
 
 	static bool TryParse(const std::string& strVersion, tVersion& version)
@@ -326,10 +330,19 @@ struct tVersion // 1.0.234
 		return true;
 	}
 
-	std::string ToString()
+	std::string ToString() const
 	{
 		return std::to_string(Major) + "." + std::to_string(Minor) + "." + std::to_string(Build);
 	}
+};
+
+static std::string GetStringEnding(const std::string& pattern, const std::string& str)
+{
+	size_t Pos = str.find(pattern);
+	if (Pos == std::string::npos)
+		return {};
+
+	return str.substr(Pos + pattern.size());
 };
 
 }

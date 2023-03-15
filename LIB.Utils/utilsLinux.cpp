@@ -1,3 +1,4 @@
+#include "utilsBase.h"
 #include "utilsLinux.h"
 #include "utilsPath.h"
 
@@ -7,7 +8,18 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 #include <string>
+
+//#define LIB_UTILS_LINUX_LOG
+
+#if defined(_WIN32)
+#include <filesystem>
+#endif
+
+#if defined(LIB_UTILS_LINUX_LOG)
+#include <iostream>
+#endif
 
 namespace utils
 {
@@ -15,29 +27,14 @@ namespace utils
 namespace linux
 {
 
+#if defined(_WIN32)
+static std::string CmdLineWinTest(const std::string& cmd);
+#endif
+
 std::string CmdLine(const std::string& cmd)
 {
 #if defined(_WIN32)
-	std::string Pattern = "realpath";
-	size_t ValuePos = cmd.find(Pattern);
-	if (ValuePos != std::string::npos)
-	{
-		std::string Value(cmd.begin() + ValuePos + Pattern.size(), cmd.end());
-		Value.erase(Value.begin(), std::find_if(Value.begin(), Value.end(), [](char ch) { return !std::isspace(ch); }));
-		if (Value.size() > 0)
-		{
-			if (Value[0] == '/')
-				return Value;
-
-			if (Value[0] == '~')
-			{
-				Value.erase(Value.begin(), std::find_if(Value.begin(), Value.end(), [](char ch) { return ch != '~'; }));
-				return "/root" + Value;
-			}
-		}
-	}
-
-	return {};
+	return CmdLineWinTest(cmd);
 #else
 	FILE* File = popen(cmd.c_str(), "r");//File = popen("/bin/ls /etc/", "r");
 	if (File == NULL)
@@ -98,7 +95,6 @@ std::string UptimeToString(double uptime)
 	SStr << std::setfill('0') << std::setw(2) << Utime_Hour << ":";
 	SStr << std::setfill('0') << std::setw(2) << Utime_Min << ":";
 	SStr << std::setfill('0') << std::setw(2) << Utime_Sec;
-	SStr << " (" << static_cast<int>(uptime / 3600) << " h " << Utime_Min << " min)";
 
 	return SStr.str();
 }
@@ -162,77 +158,86 @@ tCpuInfo GetCpuInfo()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 namespace PathConfig
 {
+
+const std::vector<std::string> g_PathConfig =
+{
+	{"."},
+	{"../etc"},
+	{"/etc"},
+	{"~/"},
+	{"/etc/default"},
+	{"/usr/local/etc"},
 #if defined(_WIN32)
-	constexpr char g_TestDirRootFS[] = "test_root_fs";
+	{".."}, // $(ProjectDir)
 #endif
+};
 
-	const std::vector<std::string> g_PathConfig =
+static bool TestFile(const std::string& fileName)
+{
+#if defined(LIB_UTILS_LINUX_LOG)
+	std::cout << "TestFile: " << fileName << '\n';
+#endif
+	std::fstream File = std::fstream(fileName, std::ios::in);
+	if (!File.good())
+		return false;
+
+	File.close();
+	return true;
+}
+
+static std::string TestPath(const std::string& path, std::string fileName, bool currPath, bool testDir)
+{
+	std::string FilePath;
+
+	if (!currPath)
 	{
-		{""},
-		{"../etc/"},
-		{"/etc/"},
-		{"~/"},
-		{"/etc/default/"},
-	#if defined(_WIN32)
-		{"../"}, // $(ProjectDir)
-	#endif
-	};
-
-	static bool TestFile(const std::string& fileName)
-	{
-		std::fstream File = std::fstream(fileName, std::ios::in);
-		if (!File.good())
-			return false;
-
-		File.close();
-		return true;
+		FilePath = path + fileName;
+		if (TestFile(FilePath))
+			return FilePath;
 	}
 
-	static std::string TestPath(const std::string& path, std::string fileName, bool testDir)
-	{
-		std::string FilePath;
+	FilePath = path + "." + fileName; // hidden file
+	if (TestFile(FilePath))
+		return FilePath;
 
-		if (!path.empty())
-		{
-			FilePath = path + fileName;
-			if (TestFile(FilePath))
-				return FilePath;
-		}
+	FilePath = path + fileName + "rc";
+	if (TestFile(FilePath))
+		return FilePath;
 
-		FilePath = path + "." + fileName; // hidden file
-		if (TestFile(FilePath))
-			return FilePath;
+	FilePath = path + "." + fileName + "rc"; // hidden file
+	if (TestFile(FilePath))
+		return FilePath;
 
-		FilePath = path + fileName + "rc";
-		if (TestFile(FilePath))
-			return FilePath;
+	FilePath = path + fileName + ".conf";
+	if (TestFile(FilePath))
+		return FilePath;
 
-		FilePath = path + "." + fileName + "rc"; // hidden file
-		if (TestFile(FilePath))
-			return FilePath;
+	FilePath = path + fileName + ".conf.json";
+	if (TestFile(FilePath))
+		return FilePath;
 
-		FilePath = path + fileName + ".conf";
-		if (TestFile(FilePath))
-			return FilePath;
-
-		FilePath = path + fileName + ".conf.json";
-		if (TestFile(FilePath))
-			return FilePath;
-
-		if (!testDir)
-			return {};
-
-		FilePath = path + fileName + "/";
-		FilePath = TestPath(FilePath, fileName, false);
-		if (!FilePath.empty())
-			return FilePath;
-
+	if (!testDir)
 		return {};
-	}
+
+	FilePath = path + fileName + "/";
+	FilePath = TestPath(FilePath, fileName, false, false);
+	if (!FilePath.empty())
+		return FilePath;
+
+	return {};
+}
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::string CorrPath(const std::string& pathRaw)
+{
+	std::string Path = pathRaw;
+	std::replace(Path.begin(), Path.end(), '\\', '/');
+	Path.erase(std::unique(Path.begin(), Path.end(), [](char a, char b) { return a == '/' && b == '/'; }), Path.end());
+	return Path;
+}
 
 std::string GetPathConfig(const std::string& fileName)
 {
@@ -241,16 +246,15 @@ std::string GetPathConfig(const std::string& fileName)
 
 	for (auto& i : PathConfig::g_PathConfig)
 	{
-		std::string PathBase = GetPathReal(i);
+		bool CurrPath = CorrPath(i) == ".";
 
 #if defined(_WIN32)
-		if (i == "../") // $(ProjectDir)
-			PathBase = "/../";
-
-		PathBase = PathConfig::g_TestDirRootFS + PathBase;
+		if (!CurrPath)
+			CurrPath = CorrPath(i) == ".."; // $(ProjectDir)
 #endif
 
-		std::string Path = PathConfig::TestPath(PathBase, fileName, true);
+		std::string PathBase = GetPathReal(i) +'/';
+		std::string Path = PathConfig::TestPath(PathBase, fileName, CurrPath, true);
 		if (!Path.empty())
 			return Path;
 	}
@@ -258,22 +262,101 @@ std::string GetPathConfig(const std::string& fileName)
 	return {};
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+std::string GetPathConfigExc(const std::string& path)
+{
+	std::string Str = GetPathConfig(path);
+	if (Str.empty())
+		throw std::runtime_error("File not found: " + path);
+	return Str;
+};
 
 std::string GetPath(const std::string& path)
 {
-	std::string PathReal = GetPathReal(path);
-
-#if defined(_WIN32)
-	if (PathReal.empty())
-		return {};
-
-	return PathConfig::g_TestDirRootFS + PathReal;
-#else
-	return PathReal;
-#endif
+	return GetPathReal(path);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Functions for tests
+#if defined(_WIN32)
+static std::string CmdLineWinTest(const std::string& cmd)
+{
+	if (cmd == "free")
+	{
+		return
+			"               total        used        free      shared  buff / cache   available\n\
+Mem:          492116       33240      129108        1184      329768      445984\n\
+Swap:              0           0           0";
+	}
+
+	std::string CmdValue = GetStringEnding("cat", cmd);
+	if (!CmdValue.empty())
+	{
+		std::string Path = GetPath(CmdValue);
+		if (Path.empty())
+			return {};
+
+		std::fstream File(Path, std::ios::in);
+		if (!File.good())
+			return {};
+
+		std::string Data;
+
+		while (!File.eof())
+		{
+			std::string Line;
+			std::getline(File, Line);
+			Data += Line + "\n";
+		}
+
+		File.close();
+
+		return Data;
+	}
+
+	CmdValue = GetStringEnding("realpath", cmd);
+	if (!CmdValue.empty())
+	{
+		auto CorrPathReal = [](const std::string& pathRaw)->std::string
+		{
+			std::string Path = CorrPath(pathRaw);
+			if (Path.back() == '/')
+				Path.pop_back();
+			return Path;
+		};
+
+		std::string PathCurr = std::filesystem::current_path().string();
+		std::string PathMain = GetStringEnding(":", PathCurr);
+		PathMain = CorrPath(PathMain);
+		PathMain += "/test_root_fs/";
+
+		CmdValue.erase(CmdValue.begin(), std::find_if(CmdValue.begin(), CmdValue.end(), [](char ch) { return !std::isspace(ch); }));
+		if (CmdValue.empty())
+			return "realpath: missing operand\nTry 'realpath --help' for more information.";
+
+		if (CmdValue.size() > 0)
+		{
+			if (CmdValue[0] == '/')
+				return CorrPathReal(PathMain + CmdValue);
+
+			if (CmdValue[0] == '~')
+			{
+				CmdValue.erase(CmdValue.begin(), std::find_if(CmdValue.begin(), CmdValue.end(), [](char ch) { return ch != '~'; }));
+				return CorrPathReal(PathMain + "root" + CmdValue);
+			}
+
+			if (CmdValue == "." || CmdValue == "./")
+				return CorrPathReal(PathMain);
+
+			if (CmdValue.find("..") == 0)
+				return CorrPathReal(PathMain + CmdValue);
+		}
+		return "It seems to be a BUG";
+	}
+
+	return {};
+}
+#endif
+///////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 }
