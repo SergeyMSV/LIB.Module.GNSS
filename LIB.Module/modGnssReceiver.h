@@ -11,6 +11,7 @@
 #include <utilsLog.h>
 #include <utilsPacketNMEA.h>
 #include <utilsPacketNMEAPayload.h>
+#include <utilsPacketNMEAPayloadPTWS.h>
 
 #include <atomic>
 #include <chrono>
@@ -327,6 +328,7 @@ public:
 	void OnReceived(const std::string& id, const tMsgGSV& msg);
 	void OnReceived(const std::string& id, const tMsgRMC_Ft4& msg);
 	void OnReceived(const std::string& id, const tMsgRMC_Ft6& msg);
+	void OnReceived(const std::string& id, const utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL& msg);
 	void OnReceived(const std::string& id);
 
 private:

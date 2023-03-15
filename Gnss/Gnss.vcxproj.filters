@@ -141,6 +141,9 @@
     <ClInclude Include="..\LIB.Utils\utilsPath.h">
       <Filter>Lib.Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\LIB.Utils\utilsPacketNMEAPayloadPTWS.h">
+      <Filter>Lib.Utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\LIB.Utils\utilsFile.h">
       <Filter>Lib.Utils</Filter>
     </ClInclude>

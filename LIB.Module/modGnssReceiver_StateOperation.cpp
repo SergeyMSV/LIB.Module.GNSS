@@ -128,6 +128,13 @@ bool tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& valu
 
 		Log.OnReceived(PacketData.Value[0], Msg);
 	}
+	else if (utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL::Try(PacketData.Value))
+	{
+		utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL Msg(PacketData.Value);
+		m_DataSet.Jamming.insert({ Msg.Index.Value, Msg.Frequency.Value });
+
+		Log.OnReceived(PacketData.Value[0], Msg);
+	}
 	else
 	{
 		Log.OnReceived(PacketData.Value[0]);

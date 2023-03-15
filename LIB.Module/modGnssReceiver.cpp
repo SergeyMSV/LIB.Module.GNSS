@@ -145,6 +145,11 @@ void tGnssReceiverPacketLog::OnReceived(const std::string& id, const tMsgRMC_Ft6
 	Write(utils::tLogColour::LightMagenta, id + " " + msg.Date.ToString() + " " + msg.Time.ToString());
 }
 
+void tGnssReceiverPacketLog::OnReceived(const std::string& id, const utils::packet_NMEA::tPayloadPTWS_JAM_SIGNAL_VAL& msg)
+{
+	Write(utils::tLogColour::LightMagenta, id + " " + msg.Index.ToString() + " " + msg.Frequency.ToString());
+}
+
 void tGnssReceiverPacketLog::OnReceived(const std::string& id)
 {
 	Write(utils::tLogColour::Yellow, id + " - NOT PARSED");

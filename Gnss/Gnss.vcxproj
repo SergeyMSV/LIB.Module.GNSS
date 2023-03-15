@@ -217,6 +217,7 @@
     <ClInclude Include="..\Lib.Utils\utilsPacket.h" />
     <ClInclude Include="..\Lib.Utils\utilsPacketNMEA.h" />
     <ClInclude Include="..\Lib.Utils\utilsPacketNMEAPayload.h" />
+    <ClInclude Include="..\LIB.Utils\utilsPacketNMEAPayloadPTWS.h" />
     <ClInclude Include="..\LIB.Utils\utilsPacketNMEAType.h" />
     <ClInclude Include="..\LIB.Utils\utilsPath.h" />
     <ClInclude Include="..\LIB.Utils\utilsSerialPort.h" />
