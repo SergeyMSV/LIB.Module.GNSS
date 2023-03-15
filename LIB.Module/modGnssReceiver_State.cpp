@@ -31,7 +31,7 @@ bool tGnssReceiver::tState::operator()()
 
 		if (DataChunk.size() > 0)
 		{
-			m_pObj->m_pLog->WriteHex(true, utils::tLogColour::LightRed, "Received", DataChunk);
+			//m_pObj->m_pLog->WriteHex(true, utils::tLogColour::LightRed, "Received", DataChunk);
 
 			m_ReceivedData.insert(m_ReceivedData.end(), DataChunk.cbegin(), DataChunk.cend());
 

@@ -329,7 +329,7 @@ public:
 	void OnReceived(const std::string& id);
 
 private:
-	void Write(utils::tLogColour colour, const std::string& msg);
+	void Write(utils::tLogColour colour, std::string msg);
 	std::string GetTimePeriodString(const std::chrono::time_point<tClock>& timePoint) const;
 	std::string GetBaudrateString(const std::chrono::time_point<tClock>& timePoint, std::size_t sizeBytes) const;
 };

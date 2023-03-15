@@ -53,7 +53,7 @@ void tGNSS::tModGnssReceiver::OnChanged(const mod::tGnssDataSet& value)
 
 	utils::RemoveFilesOutdated(g_Settings.Output.Path, g_Settings.Output.Prefix, g_Settings.Output.QtyMax);
 
-	m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightYellow, value.ToJSON());
+	//m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightYellow, value.ToJSON());
 }
 
 void tGNSS::tModGnssReceiver::Board_PowerSupply(bool state)

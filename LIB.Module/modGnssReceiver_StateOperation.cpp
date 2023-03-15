@@ -1,8 +1,5 @@
 #include "modGnssReceiver.h"
 
-#include <utilsPacketNMEA.h>
-#include <utilsPacketNMEAPayload.h>
-
 #include <chrono>
 #include <thread>
 
@@ -45,7 +42,7 @@ bool tGnssReceiver::tStateOperation::Go()
 	}
 
 	auto Time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(tClock::now() - m_StartTime).count();//C++11
-	double Time_us = static_cast<double>(Time_ns) / 1000;//C++11
+	double Time_us = static_cast<double>(Time_ns) / 1000;
 	if (Time_us > m_SettingsNMEA.PeriodMax)
 	{
 		ChangeState(new tStateError(m_pObj, "operation: no data within PeriodMAX"));
@@ -92,6 +89,8 @@ void SetDataSetNMEA_RMC(const T& packRMC, tGnssDataSet& dataSet)
 	SetParam(dataSet.Longitude, packRMC.Longitude, dataSet.Check_Position);
 	SetParam(dataSet.Speed, packRMC.Speed, dataSet.Check_Position);
 	SetParam(dataSet.Course, packRMC.Course, dataSet.Check_Position);
+
+	dataSet.ModeIndicator = packRMC.ModeIndicator.ToString();
 }
 
 bool tGnssReceiver::tStateOperation::OnReceived(const tPacketNMEA_Template& value)

@@ -1,12 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // utilsPacketNMEAPayload.h
-//
+// 2020-01-31
 // Standard ISO/IEC 114882, C++11
-//
-// |   version  |    release    | Description
-// |------------|---------------|---------------------------------
-// |      1     |   2020 01 31  |
-// |            |               | 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
@@ -167,7 +162,7 @@ struct tPayloadRMC
 	typedef Type::tLongitude<LongitudeSizeFract> longitude_type;
 	typedef Type::tFloat<0, 2> speed_type;
 	typedef Type::tFloat<0, 2> course_type;
-	typedef Type::tPositioning positioning_type;
+	typedef Type::tModeIndicator mode_indicator_type;
 
 	gnss_type GNSS;
 	valid_type Valid;
@@ -177,7 +172,7 @@ struct tPayloadRMC
 	longitude_type Longitude;
 	speed_type Speed;
 	course_type Course;
-	positioning_type Positioning;
+	mode_indicator_type ModeIndicator;
 
 	tPayloadRMC() = default;
 	explicit tPayloadRMC(const tPayloadCommon::value_type& val)
@@ -192,7 +187,7 @@ struct tPayloadRMC
 			Speed = speed_type(val[7]);
 			Course = course_type(val[8]);
 			Date = date_type(val[9]);
-			Positioning = positioning_type(val[12]);
+			ModeIndicator = mode_indicator_type(val[12]);
 		}
 	}
 
@@ -219,7 +214,7 @@ struct tPayloadRMC
 		Data.push_back(Date.ToString());
 		Data.push_back("");
 		Data.push_back("");
-		Data.push_back(Positioning.ToString());
+		Data.push_back(ModeIndicator.ToStringValue());
 
 		return Data;
 	}

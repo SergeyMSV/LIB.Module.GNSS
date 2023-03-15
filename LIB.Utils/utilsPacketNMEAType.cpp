@@ -96,34 +96,24 @@ std::string tDate::ToString() const
 	return SStream.str();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-tPositioning::tPositioning(const std::string& val)
+tModeIndicator::tModeIndicator(const std::string& val)
 {
-	if (val.size() == 1)
-	{
-		switch (val[0])
-		{
-		case 'A': Value = tPositioning_State::Autonomous; break;
-		case 'D': Value = tPositioning_State::Differential; break;
-		case 'E': Value = tPositioning_State::Estimated; break;
-		case 'M': Value = tPositioning_State::ManualInput; break;
-		case 'S': Value = tPositioning_State::Simulator; break;
-		case 'N': Value = tPositioning_State::DataNotValid; break;
-		}
-	}
+	if (val.size() == 1 && val[0] >= 'A' && val[0] <= 'Z')
+		Value = val[0];
 }
 
-std::string tPositioning::ToString() const
+std::string tModeIndicator::ToString() const
 {
 	switch (Value)
 	{
-	case tPositioning_State::Autonomous: return "A";
-	case tPositioning_State::Differential: return "D";
-	case tPositioning_State::Estimated: return "E";
-	case tPositioning_State::ManualInput: return "M";
-	case tPositioning_State::Simulator: return "S";
-	case tPositioning_State::DataNotValid: return "N";
-	default: return "-";
+	case 'A': return "Autonomous";
+	case 'D': return "Differential";
+	case 'E': return "Estimated";
+	case 'M': return "Manual input";
+	case 'S': return "Simulator";
+	case 'N': return "Not valid";
 	}
+	return "Error";
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 tSatellite::tSatellite(std::uint8_t id, std::uint8_t elevation, std::uint16_t azimuth, std::uint8_t snr)

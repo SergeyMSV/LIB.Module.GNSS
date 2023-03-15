@@ -115,12 +115,12 @@ void tGnssReceiver::ChangeState(tState* state)
 tGnssReceiverPacketLog::tGnssReceiverPacketLog(utils::tLog* log, std::chrono::time_point<tClock>& startTime)
 	:m_pLog(log), m_StartTime(startTime)
 {
-	m_pLog->WriteLine(true, utils::tLogColour::Default, "BEGIN");
+
 }
 
 tGnssReceiverPacketLog::~tGnssReceiverPacketLog()
 {
-	m_pLog->WriteLine(true, utils::tLogColour::Default, "END");
+
 }
 
 void tGnssReceiverPacketLog::OnReceived(size_t size)
@@ -147,28 +147,32 @@ void tGnssReceiverPacketLog::OnReceived(const std::string& id, const tMsgRMC_Ft6
 
 void tGnssReceiverPacketLog::OnReceived(const std::string& id)
 {
-	Write(utils::tLogColour::Yellow, id + " NOT PARSED");
+	Write(utils::tLogColour::Yellow, id + " - NOT PARSED");
 }
 
-void tGnssReceiverPacketLog::Write(utils::tLogColour colour, const std::string& msg)
+void tGnssReceiverPacketLog::Write(utils::tLogColour colour, std::string msg)
 {
 	m_MsgTime += "; ";
 	m_MsgTime += GetTimePeriodString(m_StartTime);
 	m_StartTime = tClock::now();
+
+	int Align = 26 - static_cast<int>(msg.size());
+	if (Align > 0)
+		msg += std::string(Align, ' ');
 	m_pLog->Write(true, colour, msg);
 	m_pLog->WriteLine(false, utils::tLogColour::Default, m_MsgTime);
 }
 
 std::string tGnssReceiverPacketLog::GetTimePeriodString(const std::chrono::time_point<tClock>& timePoint) const
 {
-	auto Time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(tClock::now() - timePoint).count();//C++11
+	auto Time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(tClock::now() - timePoint).count();
 	double Time_ms = static_cast<double>(Time_ns) / 1000000;
 	return std::to_string(Time_ms) + " ms";
 }
 
 std::string tGnssReceiverPacketLog::GetBaudrateString(const std::chrono::time_point<tClock>& timePoint, std::size_t sizeBytes) const
 {
-	auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - timePoint).count();//C++11
+	auto Time_us = std::chrono::duration_cast<std::chrono::microseconds>(tClock::now() - timePoint).count();
 	double Time_ms = static_cast<double>(Time_us) / 1000;
 
 	std::stringstream Str;
@@ -178,17 +182,17 @@ std::string tGnssReceiverPacketLog::GetBaudrateString(const std::chrono::time_po
 	Str << std::setw(SizeFract + 5) << std::setprecision(SizeFract);
 	Str << Time_ms << " ms, ";
 
-	double Time_s = Time_ms / 1000;
-	if (Time_s > 0)
-	{
-		Str.setf(std::ios::fixed);
-		Str << std::setw(SizeFract + 5) << std::setprecision(SizeFract);
-		Str << (static_cast<double>(sizeBytes) * 8 / Time_s) << " bps";
-	}
-	else
-	{
-		Str << "n/a";
-	}
+	//double Time_s = Time_ms / 1000;
+	//if (Time_s > 0)
+	//{
+	//	Str.setf(std::ios::fixed);
+	//	Str << std::setw(SizeFract + 8) << std::setprecision(SizeFract);
+	//	Str << (static_cast<double>(sizeBytes) * 8 / Time_s) << " bps";
+	//}
+	//else
+	//{
+	//	Str << "n/a";
+	//}
 
 	return Str.str();
 }

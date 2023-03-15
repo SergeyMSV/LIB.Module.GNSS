@@ -1,12 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // utilsPacketNMEAType.h
-//
+// 2020-01-27
 // Standard ISO/IEC 114882, C++11
-//
-// |   version  |    release    | Description
-// |------------|---------------|---------------------------------
-// |      1     |   2020 01 27  |
-// |            |               | 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
@@ -434,25 +429,13 @@ public:
 	}
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct tPositioning
+struct tModeIndicator
 {
-	enum class tPositioning_State : std::uint8_t
-	{
-		UNKNOWN = 0,
-		Autonomous,
-		Differential,
-		Estimated,
-		ManualInput,
-		Simulator,
-		DataNotValid,
-	};
+	char Value = 'N';
 
-	tPositioning_State Value = tPositioning_State::UNKNOWN;
-
-	tPositioning() = default;
-	explicit tPositioning(tPositioning_State val) :Value(val) {}
-	explicit tPositioning(const std::string& val);
-
+	tModeIndicator() = default;
+	explicit tModeIndicator(const std::string& val);
+	std::string ToStringValue() const { return std::string(1, Value); }
 	std::string ToString() const;
 };
 ///////////////////////////////////////////////////////////////////////////////////////////////////
