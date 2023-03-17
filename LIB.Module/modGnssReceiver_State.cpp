@@ -54,7 +54,10 @@ bool tGnssReceiver::tState::operator()()
 				return true;
 
 			if (OnReceived(Packet))//ChangeState
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 				return true;
+			}
 		}
 	}
 	else
