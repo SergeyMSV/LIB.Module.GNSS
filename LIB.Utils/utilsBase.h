@@ -12,9 +12,26 @@
 #include <cstring>
 
 #include <algorithm>
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+namespace utils
+{
+
+inline std::string GetLogMessage(const std::string& msg, const std::string& filename, int line)
+{
+	const std::filesystem::path Path(filename);
+	return msg + " " + Path.filename().string() + ":" + std::to_string(line);
+}
+
+}
+
+#define THROW_INVALID_ARGUMENT(msg) throw std::invalid_argument{ utils::GetLogMessage(msg, __FILE__, __LINE__) }
+#define THROW_RUNTIME_ERROR(msg) throw std::runtime_error{ utils::GetLogMessage(msg, __FILE__, __LINE__) }
+
+///////////////////////////////////////////////////////////////////////////////
 
 namespace utils
 {
@@ -143,49 +160,6 @@ typename std::enable_if<std::is_trivially_copyable<T>::value, T>::type Reverse(T
 	return value;
 }
 
-namespace type
-{
-
-template <std::size_t size>
-struct tArray1
-{
-	enum { Size = size };
-	std::uint8_t Value[size];
-
-	//tArray1() in union it's deleted by default
-	//{
-	//	std::memset(Value, 0, Size);
-	//}
-
-	std::uint8_t& operator [] (std::size_t i)
-	{
-		assert(i < Size);
-
-		return Value[i];
-	}
-
-	bool operator == (const tArray1& value)
-	{
-		return std::memcmp(Value, value.Value, Size) == 0;
-	}
-
-	bool operator != (const tArray1& value)
-	{
-		return std::memcmp(Value, value.Value, Size) != 0;
-	}
-};
-
-template <std::size_t size>
-struct tArray2 : public tArray1<size>
-{
-	tArray2()
-	{
-		std::memset(this->Value, 0, this->Size);
-	}
-};
-
-}
-
 class tEmptyAble
 {
 protected:
@@ -259,7 +233,7 @@ struct tVersion // 1.0.234
 	explicit tVersion(const std::string& strVersion)
 	{
 		if (!TryParse(strVersion, *this))
-			throw std::runtime_error("format");
+			THROW_RUNTIME_ERROR("format");
 	}
 
 	bool operator==(const tVersion& val) const
@@ -302,7 +276,7 @@ struct tVersion // 1.0.234
 	{
 		version = tVersion{};
 
-		auto IsNotVersionSymbol = [](char ch)->bool {return !isdigit(ch) && ch != '.'; };
+		auto IsNotVersionSymbol = [](char ch)->bool { return !isdigit(ch) && ch != '.'; };
 
 		std::string Value = strVersion;
 		Value.erase(std::remove_if(Value.begin(), Value.end(), IsNotVersionSymbol), Value.end());
@@ -334,15 +308,6 @@ struct tVersion // 1.0.234
 	{
 		return std::to_string(Major) + "." + std::to_string(Minor) + "." + std::to_string(Build);
 	}
-};
-
-static std::string GetStringEnding(const std::string& pattern, const std::string& str)
-{
-	size_t Pos = str.find(pattern);
-	if (Pos == std::string::npos)
-		return {};
-
-	return str.substr(Pos + pattern.size());
 };
 
 }

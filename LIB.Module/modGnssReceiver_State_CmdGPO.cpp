@@ -32,7 +32,7 @@ bool tGnssReceiver::tState::tCmdGPO::operator()()
 			m_pObjState->m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightRed, "ERR: unknown GPO");
 
 			//[TBD] throw an exception or do nothing
-			throw std::invalid_argument("Unknown GPO");
+			THROW_INVALID_ARGUMENT("Unknown GPO");
 		}
 
 		m_WaitTime_us = Ptr->Pause_us;

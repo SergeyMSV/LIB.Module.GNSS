@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Lib.Utils">
@@ -10,6 +10,9 @@
     </Filter>
     <Filter Include="Dev">
       <UniqueIdentifier>{59634b88-191d-4c3f-b606-d7533dbde411}</UniqueIdentifier>
+    </Filter>
+    <Filter Include=".vscode">
+      <UniqueIdentifier>{c40d3212-5ac6-455b-9045-2f3dff1cdf7d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,7 +83,7 @@
     <ClCompile Include="..\LIB.Utils\utilsPath.cpp">
       <Filter>Lib.Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\LIB.Utils\utilsLinux.cpp">
+    <ClCompile Include="..\LIB.Utils\utilsFile.cpp">
       <Filter>Lib.Utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -138,7 +141,7 @@
     <ClInclude Include="..\LIB.Utils\utilsPath.h">
       <Filter>Lib.Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\LIB.Utils\utilsLinux.h">
+    <ClInclude Include="..\LIB.Utils\utilsFile.h">
       <Filter>Lib.Utils</Filter>
     </ClInclude>
   </ItemGroup>
@@ -151,6 +154,15 @@
   <ItemGroup>
     <None Include="..\LIB.Utils\!Refresh.bat">
       <Filter>Lib.Utils</Filter>
+    </None>
+    <None Include="..\.vscode\c_cpp_properties.json">
+      <Filter>.vscode</Filter>
+    </None>
+    <None Include="..\.vscode\launch.json">
+      <Filter>.vscode</Filter>
+    </None>
+    <None Include="..\.vscode\tasks.json">
+      <Filter>.vscode</Filter>
     </None>
   </ItemGroup>
 </Project>

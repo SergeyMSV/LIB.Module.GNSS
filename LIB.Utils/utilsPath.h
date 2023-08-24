@@ -7,9 +7,8 @@
 
 #include <ctime>
 
-#include <deque>
+#include <filesystem>
 #include <string>
-#include <vector>
 
 namespace utils
 {
@@ -18,7 +17,17 @@ std::string GetDateTime(tm a_DateTime);
 std::string GetDateTime();
 tm GetDateTime(const std::string& a_value);
 
-std::deque<std::string> GetFilesLatest(const std::string& path, const std::string& prefix, size_t qtyFilesLatest);
-void RemoveFilesOutdated(const std::string& path, const std::string& prefix, size_t qtyFilesLatest);
+namespace path
+{
+
+std::string GetAppName(const std::filesystem::path& path);
+std::string GetAppNameMain(const std::filesystem::path& path);
+
+std::filesystem::path GetPathNormal(const std::filesystem::path& pathRaw);
+
+std::filesystem::path GetPathConfig(const std::string& filename);
+std::filesystem::path GetPathConfigExc(const std::string& filename);
+
+}
 
 }

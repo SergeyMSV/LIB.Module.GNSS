@@ -1,16 +1,12 @@
+#include "utilsBase.h"
 #include "utilsPath.h"
 
-#include <cctype>
-#include <cerrno>
 #include <cstdlib>
 
-#include <deque>
+#include <array>
 #include <filesystem>
-#include <fstream>
 #include <iomanip>
 #include <sstream>
-#include <string>
-#include <vector>
 
 namespace utils
 {
@@ -37,48 +33,142 @@ tm GetDateTime(const std::string& a_value)
 	return DateTime;
 }
 
-std::deque<std::string> GetFilesLatest(const std::string& path, const std::string& prefix, size_t qtyFilesLatest)
+namespace path
 {
-	std::deque<std::string> List;
 
-	std::error_code ErrCode;
-
-	for (auto& i : std::filesystem::directory_iterator(path, ErrCode))
-	{
-		if (ErrCode != std::error_code())
-			break;
-
-		std::string ListFileName = i.path().filename().string();
-		size_t PrefPos = ListFileName.find(prefix);
-		if (PrefPos != 0)
-			continue;
-
-		List.push_back(i.path().string());
-	}
-
-	if (qtyFilesLatest != 0)
-	{
-		std::sort(List.begin(), List.end(), [](const std::string& a, const std::string& b) { return a > b; });
-
-		if (List.size() > qtyFilesLatest)
-			List.resize(qtyFilesLatest);
-	}
-
-	std::sort(List.begin(), List.end());
-
-	return List;
+std::string GetAppName(const std::filesystem::path& path)
+{
+	std::filesystem::path PathFileName = path.filename();
+	if (PathFileName.has_extension())
+		PathFileName.replace_extension();
+	return PathFileName.string();
 }
 
-void RemoveFilesOutdated(const std::string& path, const std::string& prefix, size_t qtyFilesLatest)
+std::string GetAppNameMain(const std::filesystem::path& path)
 {
-	std::deque<std::string> List = GetFilesLatest(path, prefix, 0);
+	std::string MainPart = GetAppName(path);
+	// Main part of application name: mfrc522_xxx
+	std::size_t Pos = MainPart.find_last_of('_');
+	if (Pos != std::string::npos)
+		MainPart = MainPart.substr(0, Pos);
+	return MainPart;
+}
 
-	while (List.size() > qtyFilesLatest)
+std::filesystem::path GetPathNormal(const std::filesystem::path& pathRaw)
+{
+	if (pathRaw.empty())
+		return {};
+	std::error_code ErrCode;//In order to avoid exceptions
+	std::filesystem::path Path;
+#if defined(_WIN32)
+	Path = "test_root_fs";
+#endif
+	//path("foo") / ""      // the result is "foo/" (appends)
+	//path("foo") / "/bar"; // the result is "/bar" (replaces)
+	if (pathRaw.string()[0] == '/')
 	{
-		std::error_code ErrCode;
-		std::filesystem::remove(List.front(), ErrCode);
-		List.pop_front();
+		Path += pathRaw.lexically_normal();
 	}
+	else if (pathRaw.string()[0] == '~')
+	{
+#if defined(_WIN32)
+		std::string Home = "root";
+#else
+		std::string Home = std::getenv("HOME");
+#endif
+		std::string PathRawStr = pathRaw.string();
+		PathRawStr.replace(0, 1, Home);
+		Path /= std::filesystem::path(PathRawStr).lexically_normal();
+	}
+	else
+	{
+		Path /= pathRaw.lexically_normal();
+	}
+
+	return std::filesystem::weakly_canonical(Path, ErrCode); // it doesn't check if the file exists
+}
+
+static std::filesystem::path TestPath(const std::filesystem::path& path, std::string filename, bool currPath, bool testDir)
+{
+	auto TestPathFile = [](std::filesystem::path path, const std::string& filename, std::filesystem::path& pathFull)
+	{
+		path.append(filename);
+#if defined(LIB_UTILS_LINUX_LOG)
+		std::cout << "TestFile: " << path.string() << '\n';
+#endif
+		std::error_code ErrCode;//In order to avoid exceptions
+		pathFull = std::filesystem::canonical(path, ErrCode);
+		return !pathFull.empty();
+	};
+
+	std::filesystem::path PathFull;
+
+	// It can find itself. This statement in order to avoid that situation.
+	if (!currPath && TestPathFile(path, filename, PathFull))
+		return PathFull;
+
+	if (TestPathFile(path, "." + filename, PathFull)) // hidden file
+		return PathFull;
+	if (TestPathFile(path, filename + "rc", PathFull))
+		return PathFull;
+	if (TestPathFile(path, "." + filename + "rc", PathFull)) // hidden file
+		return PathFull;
+	if (TestPathFile(path, filename + ".conf", PathFull))
+		return PathFull;
+	if (TestPathFile(path, filename + ".conf.json", PathFull))
+		return PathFull;
+
+	if (!testDir)
+		return {};
+	std::filesystem::path PathDir = path;
+	PathDir.append(filename);
+	return TestPath(PathDir, filename, false, false);
+}
+
+std::filesystem::path GetPathConfig(const std::string& filename)
+{
+	if (filename.empty())
+		return {};
+
+	constexpr std::array PathConfig =
+	{
+		".",
+		"../etc",
+		"/etc",
+		"~/",
+		"/etc/default",
+		"/usr/local/etc",
+	#if defined(_WIN32)
+		"..", // $(ProjectDir)
+	#endif
+	};
+
+	for (const auto& i : PathConfig)
+	{
+		bool CurrPath = i == ".";
+#if defined(_WIN32)
+		if (!CurrPath)
+			CurrPath = i == ".."; // $(ProjectDir)
+#endif
+		std::filesystem::path PathItem = GetPathNormal(i);
+		if (PathItem.empty())
+			continue;
+		std::filesystem::path Path = TestPath(PathItem, filename, CurrPath, true);
+		if (!Path.empty())
+			return Path;
+	}
+
+	return {};
+}
+
+std::filesystem::path GetPathConfigExc(const std::string& filename)
+{
+	std::filesystem::path Str = GetPathConfig(filename);
+	if (Str.empty())
+		THROW_RUNTIME_ERROR("File not found: " + filename);
+	return Str;
+}
+
 }
 
 }

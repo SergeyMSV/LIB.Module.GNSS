@@ -5,7 +5,8 @@
 #include <devSettings.h>
 #include <devShell.h>
 
-#include <utilsLinux.h>
+#include <utilsBase.h>
+#include <utilsFile.h>
 #include <utilsPath.h>
 
 #include <atomic>
@@ -123,20 +124,17 @@ int main(int argc, char* argv[])
 
 	try
 	{
-		const std::filesystem::path Path{ argv[0] };
-		std::filesystem::path PathFile = Path.filename();
-		if (PathFile.has_extension())
-			PathFile.replace_extension();
-
-		std::string FileNameConf = utils::linux::GetPathConfig(PathFile.string());
+		const std::filesystem::path Path(argv[0]);
+		const std::string AppName = utils::path::GetAppNameMain(Path);
+		std::string FileNameConf = utils::path::GetPathConfig(AppName).string();
 		if (FileNameConf.empty())
-			throw std::runtime_error{"config file is not found"};
+			THROW_RUNTIME_ERROR("config file is not found");
 
 		dev::g_Settings = dev::tSettings(FileNameConf);
 	}
 	catch (std::exception & e)
 	{
-		std::cerr << "Exception: " << e.what() << "\n";
+		std::cerr << e.what() << '\n';
 
 		return static_cast<int>(utils::tExitCode::EX_CONFIG);
 	}
@@ -149,8 +147,8 @@ int main(int argc, char* argv[])
 		Thread_Shell = std::thread(dev::ThreadFunShell);
 	////////////////////////////////
 
-	utils::RemoveFilesOutdated(dev::g_Settings.Output.Path, dev::g_Settings.Output.Prefix, dev::g_Settings.Output.QtyMax);
-	utils::RemoveFilesOutdated(dev::g_Settings.Output.Path, g_FileNameTempPrefix + dev::g_Settings.Output.Prefix, 0);
+	utils::file::RemoveFilesOutdated(dev::g_Settings.Output.Path, dev::g_Settings.Output.Prefix, dev::g_Settings.Output.QtyMax);
+	utils::file::RemoveFilesOutdated(dev::g_Settings.Output.Path, g_FileNameTempPrefix + dev::g_Settings.Output.Prefix, 0);
 
 	////////////////////////////////
 
@@ -166,7 +164,7 @@ int main(int argc, char* argv[])
 	}
 	catch (std::exception & e)
 	{
-		std::cerr << "Exception: " << e.what() << "\n";
+		std::cerr << e.what() << '\n';
 
 		g_DataSetMainControl.Thread_GNSS_State = tDataSetMainControl::tStateGNSS::Exit;
 

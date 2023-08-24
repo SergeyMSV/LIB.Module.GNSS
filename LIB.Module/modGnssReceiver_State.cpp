@@ -53,7 +53,7 @@ bool tGnssReceiver::tState::operator()()
 			if (m_pCmd && m_pCmd->OnReceived(Packet))//ChangeState
 				return true;
 
-			if(OnReceived(Packet))//ChangeState
+			if (OnReceived(Packet))//ChangeState
 				return true;
 		}
 	}
@@ -102,7 +102,7 @@ void tGnssReceiver::tState::TaskScript()
 			{
 				m_pObj->m_pLog->WriteLine(true, utils::tLogColour::LightRed, "ERR: unknown task");
 
-				throw std::invalid_argument("Unknown task");
+				THROW_INVALID_ARGUMENT("Unknown task");
 				//[TBD] throw an exception or do nothing
 
 				break;
